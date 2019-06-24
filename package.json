@@ -1,0 +1,14 @@
+{
+  "name": "website",
+  "version": "1.0.0",
+  "description": "Steve Smart's personal website",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Steve Smart",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
