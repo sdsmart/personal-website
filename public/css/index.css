@@ -1,0 +1,32 @@
+@font-face {
+    font-family: pixel;
+    src: url(/font/pixel_operator.ttf);
+}
+
+html {
+    background: url(/img/bg.png) no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    font-family: pixel;
+}
+
+#centerpiece {
+    color: #FFFFFF;
+    font-size: 125px;
+    font-weight: bold;
+    text-align: center;
+
+    background: url('/img/centerpiece_bg.png'); /*#281414;*/
+    width: 650px;
+    height: 130px;
+
+    box-shadow: 10px 10px 10px black;
+
+    position: absolute;
+    top: 15%; bottom: 0;
+    left: 0; right: 0;
+    
+    margin: auto;
+}
