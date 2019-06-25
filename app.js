@@ -19,6 +19,6 @@ app.get(['/', '/home', '/index'], function(request, response) {
 app.use('/', express.static(__dirname + '/public'));
 
 // Starting server
-http.listen(process.env.PORT || DEFAULT_PORT, () => {
+http.listen(DEFAULT_PORT, () => {
     console.log(`Server started on port ${DEFAULT_PORT}`);
 });
