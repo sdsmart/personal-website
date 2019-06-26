@@ -170,6 +170,14 @@ html {
     #logo {
         font-size: 50px;
     }
+
+    /* iPad specific behavior */
+    @supports (-webkit-overflow-scrolling: touch) {
+        #centerpiece {
+            font-size: 80px;
+            padding-top: 6px;
+        }
+    }
 }
 /* --- End tablet behavior --- */
 
@@ -257,3 +265,16 @@ html {
     }
 }
 /* --- End mmobile behavior --- */
+
+/* iOS specific style changes */
+@supports (-webkit-overflow-scrolling: touch) {
+    .hover-link:hover::after {
+        width: 100%;
+        transition: width 0.3s;
+    }
+
+    .hover-link:hover::before {
+        width: 100%;
+        transition: width 0.3s;
+    }
+}
