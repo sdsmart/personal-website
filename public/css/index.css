@@ -23,19 +23,19 @@ html {
 }
 
 /* --- Navigation bar styles --- */
-
 #navbar {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    min-height: 14vh;
-    box-shadow: 10px 10px 10px black;
-    background-color: #FFFFFF
+    min-height: 10vh;
+    box-shadow: 0px 10px 10px black;
+    background-color: #EEEEEE
 }
 
 #logo {
+    color: #002984;
     float: left;
-    font-size: 60px;
+    font-size: 64px;
     font-weight: bold;
     padding: 10px 0 12px 0;
 }
@@ -48,10 +48,61 @@ html {
 }
 
 .navlinks a {
-    color: #000000;
     text-decoration: none;
     font-size: 40px;
+    font-weight: bold;
     margin: 0 10px;
+    position: relative;
+}
+
+.navlinks .home-link {
+    color: #C41C00;
+}
+
+.navlinks .about-link {
+    color: #00675B;
+}
+
+.navlinks .resume-link {
+    color: #FB8C00;
+}
+
+.navlinks .blog-link {
+    color: #087F23;
+}
+
+.navlinks .contact-link {
+    color: #6A0080;
+}
+
+.hover-link::before {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 3px;
+    background: #000000;
+    transition: width 0.3s;
+}
+
+.hover-link::after {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 3px;
+    background: #000000;
+    transition: width 0.3s;
+}
+
+.hover-link:hover::after {
+    width: calc(100% + 18px);
+    transition: width 0.3s;
+}
+
+.hover-link:hover::before {
+    width: calc(100% + 18px);
+    transition: width 0.3s;
 }
 
 #hamburger {
@@ -60,17 +111,15 @@ html {
 }
 
 #hamburger div {
-    background-color: #000000;
+    background-color: #6A0080;
     width: 32px;
     height: 4px;
     margin: 5px;
     transition: all 0.3s ease;
 }
-
 /* --- End navigation bar styles --- */
 
 /* --- Centerpiece styles --- */
-
 #centerpiece {
     color: #FFFFFF;
     font-size: 125px;
@@ -81,7 +130,7 @@ html {
     width: 650px;
     height: 130px;
 
-    box-shadow: 10px 10px 10px black;
+    box-shadow: 10px 12px 10px black;
 
     position: absolute;
     top: 150px; bottom: 0;
@@ -90,38 +139,75 @@ html {
     margin: auto;
 }
 
+#center-l1 { color: #F44336; }
+#center-l2 { color: #009688; }
+#center-l3 { color: #FF9800; }
+#center-l4 { color: #4CAF50; }
+#center-l5 { color: #9C27B0; }
+#center-l6 { color: #3F51B5; }
+#center-l7 { color: #F44336; }
+#center-l8 { color: #FF9800; }
+#center-l9 { color: #4CAF50; }
+#center-l10 { color: #9C27B0; }
 /* --- End centerpiece styles --- */
 
-/* Adjusting font size in between mobile and desktop */
-@media screen and (min-width: 768px) and (max-width: 1224px) {
+/* --- Tablet behavior --- */
+@media screen and (min-width: 768px) and (max-width: 1440px) {
     .navlinks a {
         font-size: 30px;
     }
+
+    .hover-link::before {
+        top: -2px;
+    }
+
+    #centerpiece {
+        font-size: 90px;
+        width: 450px;
+        height: 90px;
+    }
+
+    #logo {
+        font-size: 50px;
+    }
 }
+/* --- End tablet behavior --- */
 
-/* --- Navigation bar mobile behavior --- */
-
-@media screen and (max-width: 768px){
+/* --- Mobile behavior --- */
+@media screen and (max-width: 768px) {
     html, body {
         overflow-x: hidden;
+    }
+
+    #navbar {
+        max-height: 10vh;
+        margin-bottom: 20px;
     }
 
     .navlinks {
         position: absolute;
         right: 0px;
-        top: calc(14vh);
-        height: calc(86vh);
-        background-color: #FFFFFF;
+        top: calc(10vh);
+        height: calc(60vh);
         display: flex;
         flex-direction: column;
         align-items: center;
         z-index: 1;
         width: 25%;
-        transform: translateX(100%);
+        transform: translateY(-105%);
+        background-color: #EEEEEE;
+    }
+
+    .navlinks a {
+        font-size: 22px;
     }
 
     .navlinks li {
         opacity: 0;
+    }
+
+    .hover-link::before {
+        top: -3px;
     }
 
     #hamburger {
@@ -129,23 +215,21 @@ html {
     }
 
     .hamburger-active {
-        transform: translateX(0%);
+        transform: translateY(0%);
         transition: transform 0.3s ease-in;
     }
 
     .hamburger-inactive {
-        transform: translateX(100%);
+        transform: translateY(-105%);
         transition: transform 0.15s ease-in;
     }
 
     @keyframes hamburgerFade {
         from {
             opacity: 0;
-            transform: translateX(50px);
         }
         to {
             opacity: 1;
-            transform: translate(0px);
         }
     }
 
@@ -160,6 +244,16 @@ html {
     .morph-hamburger .line3 {
         transform: translate(-0px, -9px) rotate(45deg);
     }
-}
 
-/* --- end navigation bar mobile behavior --- */
+    #centerpiece {
+        font-size: 52px;
+        width: 300px;
+        height: 60px;
+        padding-top: 6px;
+    }
+
+    #logo {
+        font-size: 40px;
+    }
+}
+/* --- End mmobile behavior --- */

@@ -7,12 +7,10 @@ var app = express();
 var http = require('http').Server(app);
 
 // --- Routing ---
-
 // Index page
 app.get(['/', '/home', '/index'], function(request, response) {
     response.sendFile(__dirname + '/views/index.html');
 });
-
 // --- End Routing ---
 
 // Setting up static file service
