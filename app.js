@@ -11,6 +11,11 @@ var http = require('http').Server(app);
 app.get(['/', '/home', '/index'], function(request, response) {
     response.sendFile(__dirname + '/views/index.html');
 });
+
+// About page
+app.get(['/about', '/me'], function(request, response) {
+    response.sendFile(__dirname + '/views/about.html');
+});
 // --- End Routing ---
 
 // Setting up static file service
