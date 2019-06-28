@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+
+		<title>{{ title }}</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="/css/main.css">
+		{{#each css}}
+			<link rel="stylesheet" href="/css/{{this}}">
+		{{/each}}
+		<script src="/js/lib/jquery-3.4.1.min.js"></script>
+
+	</head>
+	<body>
+
+		<nav id="navbar">
+			<div id="logo">STEVE SMART</div>
+
+			<ul class="navlinks">
+				<li><a class="home-link hover-link {{#if index}}active-link{{/if}}" href="/">HOME</a></li>
+				<li><a class="about-link hover-link {{#if about}}active-link{{/if}}" href="/about">ABOUT</a></li>
+				<li><a class="resume-link hover-link {{#if resume}}active-link{{/if}}" href="/resume">RESUME</a></li>
+				<li><a class="blog-link hover-link {{#if blog}}active-link{{/if}}" href="/blog">BLOG</a></li>
+				<li><a class="contact-link hover-link {{#if contact}}active-link{{/if}}" href="/contact">CONTACT</a></li>
+			</ul>
+
+			<div id="hamburger">
+				<div class="line1"></div>
+				<div class="line2"></div>
+				<div class="line3"></div>
+			</div>
+		</nav>
+
+		{{{ body }}}
+
+		<script src="/js/main.js"></script>
+		{{#each js}}
+			<script src="/js/{{this}}"></script>
+		{{/each}}
+
+	</body>
+</html>
