@@ -37,6 +37,10 @@
     color: #757DE8;
 }
 
+.resume-item {
+    color: #66bb6a;
+}
+
 @media screen and (min-width: 768px) and (max-width: 1440px) {
     #central-panel {
         top: 70px;

@@ -16,6 +16,11 @@ app.get(['/', '/home', '/index'], function(request, response) {
 app.get(['/about', '/me'], function(request, response) {
     response.sendFile(__dirname + '/views/about.html');
 });
+
+// Resume page
+app.get(['/resume', '/cv'], function(request, response) {
+    response.sendFile(__dirname + '/views/resume.html');
+});
 // --- End Routing ---
 
 // Setting up static file service
