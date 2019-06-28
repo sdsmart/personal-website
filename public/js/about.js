@@ -2,7 +2,7 @@
 var aboutMeHTML = $('#about-me').html();
 $('#about-me').remove();
 
-var speed = 40;
+var speed = 30;
 var totalChars = typeWriterPrep($('#text-container'), aboutMeHTML);
 typeWriter($('#text-container'), 0, totalChars, speed);
 
