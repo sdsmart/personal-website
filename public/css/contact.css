@@ -23,22 +23,18 @@
     color: #757DE8;
 }
 
-.hidden {
-    display: none;
-}
-
-.skip-text-scroll {
-    display: inline-block;
-    text-decoration: underline;
-}
-
-.skip-text-scroll:hover {
-    cursor: pointer;
-    color: #757DE8;
-}
-
-.resume-item {
+.social-header {
     color: #66BB6A;
+}
+
+#self-portrait {
+    position: relative;
+    border-radius: 50%;
+    width: 60%;
+    display: block;
+    margin: auto;
+    margin-top: 15px;
+    border: 8px solid #000000;
 }
 
 @media screen and (min-width: 768px) and (max-width: 1440px) {
@@ -58,10 +54,5 @@
 
     #text-container {
         font-size: 14px;
-    }
-
-    img.skip-text-scroll {
-        width: 16px;
-        height: 16px;
     }
 }

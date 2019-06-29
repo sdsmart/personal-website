@@ -1,6 +1,6 @@
-// Animates centerpiece text with colorful letters
-function colorizeCenterpieceText() {
-    var color1 = '#F44336';
+// Animates portrait border with colors like on the index page
+function colorizePortraitBorder() {
+	var color1 = '#F44336';
     var color2 = '#009688';
     var color3 = '#FF9800';
     var color4 = '#4CAF50';
@@ -10,13 +10,11 @@ function colorizeCenterpieceText() {
     var textColors = [color1, color2, color3, color4, color5, color6, color1, color3, color4, color5];
     textColorsShuffled = shuffle(textColors);
 
-    $('#centerpiece span').each(function(index, span) {
-        span.style = `color: ${textColorsShuffled[index]}`;
-     });
+    $('#self-portrait').css('border', `8px solid ${textColorsShuffled[0]}`);
 }
 
 // --------------------------
 
 // Begin script
-colorizeCenterpieceText();
-setInterval(colorizeCenterpieceText, 333);
+colorizePortraitBorder();
+setInterval(colorizePortraitBorder, 500);

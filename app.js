@@ -39,6 +39,17 @@ app.get(['/resume', '/cv'], function(request, response) {
                               css: ['resume.css'],
                               js: ['resume.js']});
 });
+
+// Blog page
+// TODO
+
+// Contact page
+app.get(['/contact', '/connect', '/socials'], function(request, response) {
+	response.render('contact', {title: 'Contact Me',
+								contact: 'true',
+								css: ['contact.css'],
+								js: ['contact.js']});
+});
 // --- End Routing ---
 
 // Setting up static file service
