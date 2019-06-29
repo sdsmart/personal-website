@@ -13,28 +13,18 @@
     z-index: -2;
 }
 
-#text-container {
+#blogs-container {
     padding: 30px;
     color: #EEEEEE;
     font-size: 22px;
 }
 
-#text-container a {
+#blogs-container a {
     color: #757DE8;
 }
 
-.hidden {
-    display: none;
-}
-
-.skip-text-scroll {
-    display: inline-block;
-    text-decoration: underline;
-}
-
-.skip-text-scroll:hover {
-    cursor: pointer;
-    color: #757DE8;
+.blog-date {
+    color: #66BB6A;
 }
 
 @media screen and (min-width: 768px) and (max-width: 1440px) {

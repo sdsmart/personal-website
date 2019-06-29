@@ -23,18 +23,21 @@
     color: #757DE8;
 }
 
-.hidden {
-    display: none;
+.error-description {
+    color: #66BB6A;
 }
 
-.skip-text-scroll {
-    display: inline-block;
-    text-decoration: underline;
+.forgive-me {
+    text-align: center;
 }
 
-.skip-text-scroll:hover {
-    cursor: pointer;
-    color: #757DE8;
+#please-kitty {
+    position: relative;
+    width: 50%;
+    display: block;
+    margin: auto;
+    margin-top: 5px;
+    border: 2px solid #000000;
 }
 
 @media screen and (min-width: 768px) and (max-width: 1440px) {

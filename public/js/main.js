@@ -106,3 +106,7 @@ function shuffle(a) {
 // Begin script
 navSlide();
 windowResizeListener();
+
+$('#logo').click(function() {
+    window.location = '/';
+})

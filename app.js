@@ -35,13 +35,17 @@ app.get(['/about', '/me'], function(request, response) {
 // Resume page
 app.get(['/resume', '/cv'], function(request, response) {
     response.render('resume', {title: 'Resume',
-                              resume: 'true',
-                              css: ['resume.css'],
-                              js: ['resume.js']});
+                               resume: 'true',
+                               css: ['resume.css'],
+                               js: ['resume.js']});
 });
 
 // Blog page
-// TODO
+app.get(['/blog', '/journal', '/diary'], function(request, response) {
+    response.render('blog', {title: 'Blog',
+                              blog: 'true',
+                              css: ['blog.css']});
+});
 
 // Contact page
 app.get(['/contact', '/connect', '/socials'], function(request, response) {
@@ -54,6 +58,20 @@ app.get(['/contact', '/connect', '/socials'], function(request, response) {
 
 // Setting up static file service
 app.use('/', express.static(__dirname + '/public'));
+
+// --- Error handling ---
+// 404 - page not found
+app.use(function(request, response) {
+  response.status(404).render('errors/error404', {title: '404',
+												  css: ['error.css']});
+});
+
+// 500 - server error
+app.use(function(error, request, response, next) {
+  response.status(500).render('errors/error500', {title: '500',
+												  css: ['error.css']});
+});
+// --- End error handling
 
 // Starting server
 http.listen(DEFAULT_PORT, () => {
