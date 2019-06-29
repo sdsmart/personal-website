@@ -40,19 +40,30 @@ app.get(['/resume', '/cv'], function(request, response) {
                                js: ['resume.js']});
 });
 
-// Blog page
+// Main blog page
 app.get(['/blog', '/journal', '/diary'], function(request, response) {
     response.render('blog', {title: 'Blog',
-                              blog: 'true',
-                              css: ['blog.css']});
+                             blog: 'true',
+                             css: ['blog_main.css'],
+                             js: ['blog_main.js']});
 });
+
+// ### Individual blog pages ###
+// 1 - Introductory blog post
+app.get(['/blog/1', '/journal/1', '/diary/1'], function(request, response) {
+    response.render('blogs/1', {title: 'Introductory Blog Post',
+                                blog: 'true',
+                                css: ['blog_individual.css'],
+                                js: ['blog_individual.js']});
+});
+// ### End individual blog pages ###
 
 // Contact page
 app.get(['/contact', '/connect', '/socials'], function(request, response) {
-	response.render('contact', {title: 'Contact Me',
-								contact: 'true',
-								css: ['contact.css'],
-								js: ['contact.js']});
+    response.render('contact', {title: 'Contact Me',
+                                contact: 'true',
+                                css: ['contact.css'],
+                                js: ['contact.js']});
 });
 // --- End Routing ---
 
@@ -63,13 +74,13 @@ app.use('/', express.static(__dirname + '/public'));
 // 404 - page not found
 app.use(function(request, response) {
   response.status(404).render('errors/error404', {title: '404',
-												  css: ['error.css']});
+                                                  css: ['error.css']});
 });
 
 // 500 - server error
 app.use(function(error, request, response, next) {
   response.status(500).render('errors/error500', {title: '500',
-												  css: ['error.css']});
+                                                  css: ['error.css']});
 });
 // --- End error handling
 

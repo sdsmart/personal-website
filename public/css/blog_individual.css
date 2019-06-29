@@ -1,0 +1,100 @@
+#central-panel {
+    position: absolute;
+    width: 45%;
+    min-height: calc(100% - 90px);
+    background-color: #151826;
+    z-index: 0;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    top: 90px;
+    box-shadow: -5px 0px 5px 0px black, 5px 0px 5px 0px black;
+    z-index: -2;
+}
+
+#text-container {
+    padding: 30px;
+    color: #EEEEEE;
+    font-size: 22px;
+}
+
+#text-container a {
+    color: #757DE8;
+}
+
+.blog-date {
+    color: #66BB6A;
+}
+
+#comments-container {
+    background-color: #212121;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    margin-top: 10px;
+}
+
+.comment-name {
+    font-weight: bold;
+    color: #64b5f6;
+}
+
+.comment-date {
+    color: #66BB6A;
+}
+
+.comment-time {
+    color: #CE93D8;
+}
+
+#new-comment {
+    width: 100%;
+    height: 150px;
+    font-size: 20px;
+    background-color: #EEEEEE;
+    padding: 5px;
+    margin-top: 3px;
+    border: 1px solid #000000;
+}
+
+#post-a-comment {
+    color: #FB8C00;
+}
+
+#post-button-container {
+    text-align: right;
+}
+
+#post-button {
+  background-color: #388e3c;
+  border: none;
+  color: white;
+  padding: 7px 14px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px;
+  margin-top: 3px;
+}
+
+@media screen and (min-width: 768px) and (max-width: 1440px) {
+    #central-panel {
+        top: 70px;
+        min-height: calc(100% - 70px);
+        width: 55%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #central-panel {
+        top: 60px;
+        min-height: calc(100% - 60px);
+        width: 100%;
+    }
+
+    #text-container {
+        font-size: 14px;
+    }
+}
