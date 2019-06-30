@@ -23,8 +23,14 @@
     color: #757DE8;
 }
 
-.blog-date {
-    color: #66BB6A;
+.centered-image {
+    position: relative;
+    width: 60%;
+    display: block;
+    margin: auto;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border: 2px solid #000000;
 }
 
 #comment-section-container {
@@ -89,6 +95,16 @@
     display: inline-block;
     float: left;
     margin-top: 3px;
+}
+
+.sign-out-link {
+    cursor: pointer;
+    text-decoration: underline;
+    color: #757DE8;
+    font-size: 18px;
+    float: left;
+    margin-left: 10px;
+    margin-top: 12px;
 }
 
 .hidden {

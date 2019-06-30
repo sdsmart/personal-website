@@ -3,7 +3,27 @@
   	<h1 style="display: inline-block;">{{ title }}</h1>
     <br>
     <br>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    <p>For this introductory blog post, I thought I would just write about myself in a more fun and personal way compared to the <a href="/about">About</a> page on this website. I'll discuss my family, my interests, and thus what I will be writing about in future blog posts!</p>
+    <br>
+    <h3>Family</h3>
+    <p>I married the love of my life on December 10, 2016. Her name is Allison Smart (was Allison Panova) and she is so caring and beautiful on the inside and out. With her by my side I can get through anything! Here is a picture of her:</p>
+    <img src="/img/allison.jpg" class="centered-image">
+    <p>As you probably noticed, we also have an adorable doggo named Baxter. We got him from <a href="http://rmpuppyrescue.org/">Rocky Mountain Puppy Rescue</a> and we are pretty sure he is some kind of mix between a <a href="https://en.wikipedia.org/wiki/Australian_Cattle_Dog">Cattle Dog</a> and an <a href="https://en.wikipedia.org/wiki/Australian_Shepherd">Australian Shepherd</a>. But the only thing you really need to know is that he is the goodest boy. We also have an amazing cat named Akali (for those of you that recognize that name, yes... I named my cat after a video game character). We just call her kitty most of the time, though.</p>
+    <br>
+    <h3>Interests</h3>
+    <p>I'm a huge nerd and I totally embrace it. I love playing video games, watching anime, coding, reading, writing, watching twitch streams, all the good stuff. The games I have consistently played throughout the years are <a href="https://leagueoflegends.com">League of Legends</a> (here is my <a href=https://u.gg/lol/profile/na1/smartypantz/overview">Summoner Profile</a>), <a href="https://oldschool.runescape.com/">Old School Runescape</a>, and classic Nintendo games like Zelda, Mario, Smash Bros Melee, etc. I love games so much that I often watch other people play games on <a href="https://www.twitch.tv/">Twitch</a>!</p>
+    <br>
+    <p>Another hobby of mine that perfectly fits the nerd stereotype is watching anime. I really believe that anime is the best medium for telling incredibly in-depth stories. The animated medium doesn't restrict the author as much as a live action film or television show does and the visuals and music add extra emotion that novels can't quite compete with. One particular anime has literally changed my life--Naruto.</p>
+    <img src="/img/gifs/naruto.gif" class="centered-image">
+    <p>The story of Naruto (Naruto and Naruto Shippuden together) is the deepest, most exciting, most suspenseful, most motivating story I have ever watched unfold. Skipping the filler episodes is <strong>absolutely crucial</strong>, otherwise the show is completely ruined. See this -> <a href="https://www.animefillerlist.com/shows/naruto">Naruto Filler List</a> and this -> <a href="https://www.animefillerlist.com/shows/naruto-shippuden">Naruto Shippuden Filler List</a>. The story spoke to me on such a personal level that I have changed the way I live my life having watched it. The show gets a bad reputation and is thought of as an "intro anime" or a "kids show", but I assure you... if you watch the entire series <strong>skipping filler</strong> all the way through, it hits on some of the deepest and most meaningful subjects to humanity that kids cannot even begin to understand. Anyway... I'm sure I will write several blog posts about Naruto and anime in the future.</p>
+    <br>
+    <p>I also like to follow (and play when I get the chance) sports. I am a fan of the Oklahoma City Thunder (I'm still salty about Kevin Durant leaving), and the Dallas Cowboys. I also love watching and playing golf, but unfortunately, living in Broomfield CO makes it difficult to find an economically viable way to play--the courses are quite expensive here!</p>
+    <br>
+    <p>I also love reading books and listening to podcasts. If it wasn't obvious from my love for anime, I am a huge fan of the fantasy genre and I hope one day I can write my own fantasy novel. My primary inspirations are Naruto, Hunter x Hunter, Game of Thrones, Lord of the Rings, and the King Killer Chronicles. I also like to read and listen to non-fiction content, especially about physics and philosophy. I recommend the <a href="http://www.feynmanlectures.caltech.edu/">The Feynman Lectures</a>, <a href="https://partiallyexaminedlife.com/">The Partially Examined Life</a>, <a href="http://philosophizethis.org/">Philosophize This!</a>, and <a href="http://www.astronomycast.com/">Astronomy Cast</a> to name a few.</p>
+    <br>
+    <p>Anyway, hopefully you know a little more about me now. I could go on for days about all these subjects and many more--and I will be doing just that in future blog posts! Have a nice day.</p>
+    <br>
+    <p>- Steve</p>
     <br>
     <br>
     <h3>COMMENTS</h3>
@@ -23,17 +43,25 @@
         <textarea id="new-comment" placeholder="Join the discussion!" maxlength="512"></textarea>
       </div>
       <div id="post-button-container">
-        <div id="my-signin2"></div>
+        <div id="my-signin2"></div><div onclick="signOut();" class="sign-out-link hidden">Sign out</div>
         <div class="post-button hidden">POST</div>
       </div>
       <script>
+        function signOut() {
+          var auth2 = gapi.auth2.getAuthInstance();
+          auth2.signOut();
+          $('#user-full-name').html('');
+          $('#new-comment-container').addClass('hidden');
+          $('.post-button').first().addClass('hidden');
+          $('.sign-out-link').addClass('hidden');
+        }
         function onSuccess(googleUser) {
           var profile = googleUser.getBasicProfile();
           var userFullName = profile.getName();
           $('#user-full-name').html(userFullName);
           $('#new-comment-container').removeClass('hidden');
           $('.post-button').first().removeClass('hidden');
-          $('.anonymous-button').first().html('Sign in Anonymously');
+          $('.sign-out-link').removeClass('hidden');
         }
         function onFailure(error) {}
         function renderButton() {
