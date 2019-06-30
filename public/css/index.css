@@ -1,4 +1,12 @@
 /* --- Centerpiece styles --- */
+body {
+    overflow: hidden;
+    -webkit-user-select: none;
+    -moz-user-select: -moz-none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 #centerpiece {
     color: #FFFFFF;
     font-size: 125px;
@@ -16,6 +24,12 @@
     left: 0; right: 0;
     
     margin: auto;
+
+    z-index: -2;
+}
+
+canvas {
+    pointer-events: none;
 }
 
 #center-l1 { color: #F44336; }
