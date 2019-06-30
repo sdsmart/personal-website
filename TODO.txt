@@ -1,23 +1,11 @@
 Website TODOs
 -------------
 
-+ write intro blog post and add description in white text below the post on main blog page
 + Add pixi sprite functionality on home page
-
 + Upload project to web server
 	+ Install all the needed services like node/npm, mongodb, etc.
 	+ Adjust Google OAuth details to work with webserver
-
-+Look into SSH and actually authenticating google users securely
-
++Look into SSL and actually authenticating google users securely
 +Thoroughly test website on web server
-
 +Create and write README.md for github page
 +Make repo public
-
--------------
-
-Google OAuth Details:
-
-Client ID: 498828023330-5f3jg27hrono046m11hoabtcq35ars3u.apps.googleusercontent.com
-Client Secret: YIfoYYpsrHgQwngCVKjW5qcK
