@@ -5,30 +5,49 @@
     <br>
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
     <br>
+    <br>
     <h3>COMMENTS</h3>
-    <div id="comments-container">
-      <span class="comment-name">Firstname Lastname</span> on <span class="comment-date">06/30/2019</span> at <span class="comment-time">10:48 AM</span>
-      <br>
-      &#x25B8 This is a comment on the introductory blog post.
-      <br>
-      <br>
-      <span class="comment-name">Test Testington</span> on <span class="comment-date">06/30/2019</span> at <span class="comment-time">2:17 PM</span>
-      <br>
-      &#x25B8 Test comment here.
-      <br>
-      <br>
-      <span class="comment-name">John Smith</span> on <span class="comment-date">07/01/2019</span> at <span class="comment-time">4:14 PM</span>
-      <br>
-      &#x25B8 Here is a much longer comment where I put enough words to span a couple lines and I keep writing to ensure this happens. I'll write a second sentence here just in case the first sentence wasn't long enough to accomplish this task.
-      <br>
-      <br>
-      <p id="post-a-comment">Post a Comment:</p>
-      <div id="new-comment-container">
-        <textarea id="new-comment" placeholder="Join the discussion!"></textarea>
-        <div id="post-button-container">
-          <div id="post-button">POST</div>
-        </div>
+    <div id="comment-section-container">
+      <div id="comments-container">
+        {{#each comments}}
+          <span class="comment-name">{{this.name}}</span> on <span class="comment-date comment-date-{{@index}}">{{this.date}}</span> at <span class="comment-time comment-time-{{@index}}">{{this.time}}</span>
+          <br>
+          &#x25B8 {{{this.comment}}}
+          <br>
+          <br>
+        {{/each}}
       </div>
+      <p id="post-a-comment">Post a Comment:</p>
+      <div id="new-comment-container" class="hidden">
+        <div id="user-full-name" class="hidden"></div>
+        <textarea id="new-comment" placeholder="Join the discussion!" maxlength="512"></textarea>
+      </div>
+      <div id="post-button-container">
+        <div id="my-signin2"></div>
+        <div class="post-button hidden">POST</div>
+      </div>
+      <script>
+        function onSuccess(googleUser) {
+          var profile = googleUser.getBasicProfile();
+          var userFullName = profile.getName();
+          $('#user-full-name').html(userFullName);
+          $('#new-comment-container').removeClass('hidden');
+          $('.post-button').first().removeClass('hidden');
+          $('.anonymous-button').first().html('Sign in Anonymously');
+        }
+        function onFailure(error) {}
+        function renderButton() {
+          gapi.signin2.render('my-signin2', {
+            'width': 120,
+            'height': 39,
+            'longtitle': false,
+            'theme': 'dark',
+            'onsuccess': onSuccess,
+            'onfailure': onFailure
+          });
+        }
+      </script>
+      <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
     </div>
   </div>
 </div>
