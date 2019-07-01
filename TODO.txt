@@ -1,14 +1,18 @@
 Website TODOs
 -------------
 
-+ Add sound / music
-
 + Upload project to web server
 	+ Install all the needed services like node/npm, mongodb, etc.
 	+ Adjust Google OAuth details to work with webserver
 
 +Look into SSL and actually authenticating google users securely
+
 +Thoroughly test website on web server
 
 +Create and write README.md for github page
 +Make repo public
+
+---
+Comment to add after installing mongodb on webserver:
+
+Thanks for reading this! I just wanted to post a comment to test this comment system that I made. Let's see... do emojis work? 🙏👍🤓 

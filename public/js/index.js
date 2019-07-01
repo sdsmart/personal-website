@@ -33,6 +33,44 @@ function isTouchDevice() {
 // --------------------------
 
 // Begin script
+let playSound = false;
+let soundtrack = new Audio('/sound/soundtrack.mp3'); 
+soundtrack.volume = 0.08;
+soundtrack.loop = true;
+
+let spellSound = new Audio('/sound/spell.wav');
+spellSound.volume = 0.03;
+
+let spellCollideSound = new Audio('/sound/spell_collide.wav');
+spellCollideSound.volume = 0.3;
+spellCollideSound.addEventListener('ended', function() {
+    collidedNavElement.firstChild.click();
+});
+
+let deathSound = new Audio('/sound/death2.wav');
+deathSound.volume = 0.4;
+
+$('#mute-sound img').click(function() {
+
+    $('.speaker-img').each(function() {
+        $(this).toggleClass('hidden');
+    })
+
+    playSound = !playSound;
+
+    // Play background soundtrack
+    if (playSound == true) {
+        soundtrack.play().catch(function() {
+            console.log('Failed to play background music.');
+        });
+    }
+    else {
+        soundtrack.currentTime = 0;
+        soundtrack.pause();
+    }
+})
+
+// Animate centerpiece text
 colorizeCenterpieceText();
 setInterval(colorizeCenterpieceText, 333);
 
@@ -368,7 +406,9 @@ function checkSpellCollision() {
 }
 
 function spellCollisionComplete() {
-    collidedNavElement.firstChild.click();
+    if (!playSound) {
+        collidedNavElement.firstChild.click();
+    }
 }
 
 function checkSpellNavCollision(navElement) {
@@ -391,6 +431,12 @@ function checkSpellNavCollision(navElement) {
         collidedNavElement = navElement;
 
         spell.play();
+
+        if (playSound) {
+            spellCollideSound.pause();
+            spellCollideSound.currentTime = 0;
+            spellCollideSound.play();
+        }
     }
 }
 
@@ -528,11 +574,13 @@ function keyboard(value) {
 
 // Callback function for when the cast animation is completed
 function castAnimationComplete() {
-    if (mage.textures == mageCastingRightTextures) {
-        mage.textures = mageWalkingRightTextures;
-    }
-    else {
-        mage.textures = mageWalkingLeftTextures;
+    if (mage) {
+        if (mage.textures == mageCastingRightTextures) {
+            mage.textures = mageWalkingRightTextures;
+        }
+        else {
+            mage.textures = mageWalkingLeftTextures;
+        }
     }
 }
 
@@ -564,10 +612,10 @@ function castSpell() {
         spell.scale.set(0.05);
     }
     else if ($(window).width() <= 1440) {
-        spell.scale.set(1.368);
+        spell.scale.set(1.9);
     }
     else {
-        spell.scale.set(1.8);
+        spell.scale.set(2.5);
     }
 
     spell.anchor.x = 0.5;
@@ -590,6 +638,12 @@ function castSpell() {
 
     app.stage.addChild(spell);
     spell.play();
+
+    if (playSound) {
+        spellSound.pause();
+        spellSound.currentTime = 0;
+        spellSound.play();
+    }
 }
 
 // Kill the mage
@@ -604,4 +658,16 @@ function killMage() {
     jump.press = null;
 
     mageDied = true;
+
+    if (instructions && (displayInstructions == true)) {
+        displayInstructions = false;
+        app.stage.removeChild(instructions);
+        instructions = null;
+    }
+
+    if (playSound) {
+        deathSound.pause();
+        deathSound.currentTime = 0;
+        deathSound.play();
+    }
 }

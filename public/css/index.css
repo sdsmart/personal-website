@@ -44,6 +44,18 @@ canvas {
 #center-l10 { color: #9C27B0; }
 /* --- End centerpiece styles --- */
 
+.speaker-img {
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
 /* --- Tablet behavior --- */
 @media screen and (min-width: 768px) and (max-width: 1440px) {
     #centerpiece {
@@ -70,6 +82,14 @@ canvas {
         height: 60px;
         padding-top: 6px;
         top: 0px;
+    }
+
+    .speaker-img {
+        margin-top: -10px;
+    }
+
+    canvas {
+        display: none;
     }
 }
 /* --- End mmobile behavior --- */
