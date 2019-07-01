@@ -1,12 +1,15 @@
 Website TODOs
 -------------
 
-+ Add pixi sprite functionality on home page
++ Add instructions on home page
 + Add sound / music
+
 + Upload project to web server
 	+ Install all the needed services like node/npm, mongodb, etc.
 	+ Adjust Google OAuth details to work with webserver
+
 +Look into SSL and actually authenticating google users securely
 +Thoroughly test website on web server
+
 +Create and write README.md for github page
 +Make repo public

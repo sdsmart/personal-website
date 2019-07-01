@@ -164,11 +164,11 @@ html {
         position: absolute;
         right: 0px;
         top: 60px;
-        height: calc(60% - 60px);
+        height: calc(100% - 60px);
         display: flex;
         flex-direction: column;
         align-items: center;
-        z-index: 1;
+        z-index: 0;
         width: 25%;
         transform: translateY(-105%);
         background-color: #EEEEEE;
