@@ -44,7 +44,7 @@ soundtrack.volume = 0.08;
 soundtrack.loop = true;
 
 let spellSound = new Audio('/sound/spell.wav');
-spellSound.volume = 0.03;
+spellSound.volume = 0.05;
 
 let spellCollideSound = new Audio('/sound/spell_collide.wav');
 spellCollideSound.volume = 0.3;
@@ -53,7 +53,7 @@ spellCollideSound.addEventListener('ended', function() {
 });
 
 let deathSound = new Audio('/sound/death2.wav');
-deathSound.volume = 0.4;
+deathSound.volume = 0.3;
 
 $('#mute-sound img').click(function() {
 
