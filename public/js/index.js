@@ -33,6 +33,11 @@ function isTouchDevice() {
 // --------------------------
 
 // Begin script
+$('a').click(function() {
+    event.stopPropagation();
+})
+
+// Setting up sound effects
 let playSound = false;
 let soundtrack = new Audio('/sound/soundtrack.mp3'); 
 soundtrack.volume = 0.08;
@@ -68,6 +73,8 @@ $('#mute-sound img').click(function() {
         soundtrack.currentTime = 0;
         soundtrack.pause();
     }
+
+    event.stopPropagation();
 })
 
 // Animate centerpiece text
