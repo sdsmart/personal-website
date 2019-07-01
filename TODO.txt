@@ -1,7 +1,6 @@
 Website TODOs
 -------------
 
-+ Add instructions on home page
 + Add sound / music
 
 + Upload project to web server

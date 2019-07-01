@@ -15,6 +15,21 @@ function colorizeCenterpieceText() {
      });
 }
 
+// Detect if the current device is a touch screen
+function isTouchDevice() {
+    var prefixes = ' -webkit- -moz- -o- -ms- '.split(' ');
+    var mq = function(query) {
+        return window.matchMedia(query).matches;
+    }
+
+    if (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
+        return true;
+    }
+
+    var query = ['(', prefixes.join('touch-enabled),('), 'heartz', ')'].join('');
+    return mq(query);
+}
+
 // --------------------------
 
 // Begin script
@@ -42,7 +57,7 @@ document.body.appendChild(app.view);
 // Game constants
 const gravity = 0.7;
 const friction = 0.5;
-const maxXSpeed = 7;
+const maxXSpeed = 6;
 var mageDied = false;
 var collidedNavElement = null;
 var addGameLoop = true;
@@ -103,6 +118,31 @@ for (let i=0; i < spellCollisionImgs.length; i++) {
     spellCollisionTextures.push(Texture.from(spellCollisionImgs[i]));
 }
 
+// Instructions sprite and textures
+let instructions = null;
+
+let displayInstructions = true;
+
+let instructionsImgs = ['/img/sprites/instructions_desktop.png'];
+
+if ($(window).width() <= 768) {
+    instructionsXOffset = 0;
+}
+else if ($(window).width() <= 1440) {
+    instructionsXOffset = 50;
+}
+else {
+    instructionsXOffset = 70;
+}
+
+if (isTouchDevice() == true) {
+    instructionsImgs = ['/img/sprites/instructions_touch.png'];
+}
+let instructionsTextures = [];
+for (let i=0; i < instructionsImgs.length; i++) {
+    instructionsTextures.push(Texture.from(instructionsImgs[i]));
+}
+
 // Keyboard objects
 left = keyboard('a');
 right = keyboard('d');
@@ -144,26 +184,61 @@ function setup() {
 
     left.press = function() {
         mage.leftPressed = true;
+        displayInstructions = false;
+        app.stage.removeChild(instructions);
     }
     left.release = function() {
         mage.leftPressed = false;
+        displayInstructions = false;
+        app.stage.removeChild(instructions);
     }
 
     right.press = function() {
         mage.rightPressed = true;
+        displayInstructions = false;
+        app.stage.removeChild(instructions);
     }
     right.release = function() {
         mage.rightPressed = false;
+        displayInstructions = false;
+        app.stage.removeChild(instructions);
     }
 
     jump.press = function() {
         if (mage.jumping == false) {
             mage.vy = -13;
         }
+        displayInstructions = false;
+        app.stage.removeChild(instructions);
     }
 
     // Adding the mage sprite the the stage
     app.stage.addChild(mage);
+
+    // Display instructions if needed
+    if (displayInstructions) {
+        instructions = new AnimatedSprite(instructionsTextures);
+
+        if ($(window).width() <= 768) {
+            instructions.scale.set(0.05);
+            instructionsXOffset = 0;
+        }
+        else if ($(window).width() <= 1440) {
+            instructions.scale.set(0.30);
+            instructionsXOffset = 50;
+        }
+        else {
+            instructions.scale.set(0.40);
+            instructionsXOffset = 70;
+        }
+
+        instructions.anchor.x = 0.5;
+        instructions.anchor.y = 1;
+        instructions.x = mage.x + instructionsXOffset;
+        instructions.y = mage.y - mage.height;
+
+        app.stage.addChild(instructions);
+    }
 
     // Register event listener for casting a spell
     $(document).click(castSpell);
@@ -220,6 +295,11 @@ function gameLoop(delta) {
 
         mage.x += mage.vx;
         mage.y += mage.vy;
+
+        if (displayInstructions) {
+            instructions.x = mage.x + instructionsXOffset;
+            instructions.y = mage.y - mage.height;
+        }
 
         checkMageCollision();
     }
@@ -324,6 +404,7 @@ function resizeUpdate() {
             app = null;
             mage = null;
             spell = null;
+            instructions = null;
             left.press = null;
             left.release = null;
             right.press = null;
@@ -338,6 +419,7 @@ function resizeUpdate() {
         // Rescale the mage based on window width
         if ($(window).width() <= 768) {
             mage.scale.set(0.05);
+
         }
         else if ($(window).width() <= 1440) {
             mage.scale.set(0.19);
@@ -359,6 +441,24 @@ function resizeUpdate() {
 
         mage.x = xPositionRatio * $(window).width();
         mage.y = (yPositionRatio * $(window).height()) - yOffset;
+
+        if (displayInstructions) {
+            if ($(window).width() <= 768) {
+                instructions.scale.set(0.05);
+                instructionsXOffset = 0;
+            }
+            else if ($(window).width() <= 1440) {
+                instructions.scale.set(0.30);
+                instructionsXOffset = 50;
+            }
+            else {
+                instructions.scale.set(0.40);
+                instructionsXOffset = 70;
+            }
+
+            instructions.x = mage.x + instructionsXOffset;
+            instructions.y = mage.y - mage.height;
+        }
     }
     else {
         if (($(window).width() > 768) && (mageDied == false)) {
@@ -439,6 +539,9 @@ function castAnimationComplete() {
 // Casts a spell towards the mouse on click
 function castSpell() {
     if (spell || !mage) { return; }
+
+    displayInstructions = false;
+    app.stage.removeChild(instructions);
 
     let mouseX = event.clientX;
     let mouseY = event.clientY;
