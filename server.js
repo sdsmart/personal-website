@@ -1,6 +1,3 @@
-// Constants
-const DEFAULT_PORT = 8888
-
 // Initializing express
 var express = require('express');
 var app = express();
@@ -12,6 +9,9 @@ var sanitize = require('mongo-sanitize');
 var xss = require('xss');
 var mongodb = require('mongodb').MongoClient;
 var dbURL = "mongodb://localhost:27017/blog_db";
+
+// Setting the port
+app.set('port', (process.env.PORT || 80));
 
 // Setup body parser
 app.use(bodyParser.json());
@@ -148,6 +148,6 @@ app.use(function(error, request, response, next) {
 // --- End error handling
 
 // Starting server
-http.listen(DEFAULT_PORT, () => {
-    console.log(`Server started on port ${DEFAULT_PORT}`);
+http.listen(app.get('port'), function() {
+    console.log(`Server started on port ${app.get('port')}`);
 });
