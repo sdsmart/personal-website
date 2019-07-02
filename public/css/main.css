@@ -1,10 +1,14 @@
-/* Importing pixel operator font */
+/* 
+-------------------- 
+Begin Primary styles
+--------------------
+*/
+
 @font-face {
     font-family: pixel;
     src: url(/font/pixel_operator.ttf);
 }
 
-/* Removing margin and padding and setting font */
 * {
     margin: 0px;
     padding: 0px;
@@ -12,7 +16,6 @@
     font-family: pixel;
 }
 
-/* Adding background */
 html {
     background: url(/img/bg.png) no-repeat center center fixed;
     -webkit-background-size: cover;
@@ -22,7 +25,6 @@ html {
     min-height: 100%;
 }
 
-/* --- Navigation bar styles --- */
 #navbar {
     display: flex;
     justify-content: space-around;
@@ -127,9 +129,19 @@ html {
     height: 3px;
     background: #000000;
 }
-/* --- End navigation bar styles --- */
 
-/* --- Tablet size behavior --- */
+/* 
+------------------ 
+End Primary styles
+------------------
+*/
+
+/* 
+---------------------
+Begin Tablet Behavior
+---------------------
+*/ 
+
 @media screen and (min-width: 768px) and (max-width: 1440px) {
     #navbar {
         height: 70px;
@@ -147,9 +159,19 @@ html {
         font-size: 50px;
     }
 }
-/* --- End tablet behavior --- */
 
-/* --- Mobile size behavior --- */
+/* 
+-------------------
+End Tablet Behavior
+-------------------
+*/
+
+/* 
+---------------------
+Begin Mobile Behavior
+---------------------
+*/ 
+
 @media screen and (max-width: 768px) {
     html, body {
         overflow-x: hidden;
@@ -225,9 +247,19 @@ html {
         font-size: 40px;
     }
 }
-/* --- End mmobile behavior --- */
 
-/* --- iOS only behavior (iPhone, iPad) --- */
+/* 
+-------------------
+End Mobile Behavior
+-------------------
+*/
+
+/* 
+-----------------------
+Begin iOS only Behavior
+-----------------------
+*/
+
 @supports (-webkit-overflow-scrolling: touch) {
     .hover-link::after {
         content: ;
@@ -246,4 +278,9 @@ html {
         background: #000000;
     }
 }
-/* --- End iOS only behavior (iPhone, iPad) --- */
+
+/* 
+---------------------
+End iOS only Behavior
+---------------------
+*/

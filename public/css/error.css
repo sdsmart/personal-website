@@ -1,3 +1,9 @@
+/* 
+------------------ 
+Begin Error styles
+------------------
+*/ 
+
 #central-panel {
     position: absolute;
     width: 45%;
@@ -40,6 +46,18 @@
     border: 2px solid #000000;
 }
 
+/* 
+---------------- 
+End Error styles
+----------------
+*/ 
+
+/* 
+---------------------
+Begin Tablet Behavior
+---------------------
+*/ 
+
 @media screen and (min-width: 768px) and (max-width: 1440px) {
     #central-panel {
         top: 70px;
@@ -47,6 +65,18 @@
         width: 55%;
     }
 }
+
+/* 
+-------------------
+End Tablet Behavior
+-------------------
+*/ 
+
+/* 
+---------------------
+Begin Mobile Behavior
+---------------------
+*/ 
 
 @media screen and (max-width: 768px) {
     #central-panel {
@@ -59,3 +89,9 @@
         font-size: 14px;
     }
 }
+
+/* 
+-------------------
+End Mobile Behavior
+-------------------
+*/

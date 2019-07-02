@@ -1,4 +1,19 @@
-// Initializing express
+/*
+=================================================================
+ (                              (       *             (            
+ )\ )  *   )                    )\ )  (  `     (      )\ )  *   )  
+(()/(` )  /( (    (   (   (    (()/(  )\))(    )\    (()/(` )  /(  
+ /(_))( )(_)))\   )\  )\  )\    /(_))((_)()\((((_)(   /(_))( )(_)) 
+(_)) (_(_())((_) ((_)((_)((_)  (_))  (_()((_))\ _ )\ (_)) (_(_())  
+/ __||_   _|| __|\ \ / / | __| / __| |  \/  |(_)_\(_)| _ \|_   _|  
+\__ \  | |  | _|  \ V /  | _|  \__ \ | |\/| | / _ \  |   /  | |    
+|___/  |_|  |___|  \_/   |___| |___/ |_|  |_|/_/ \_\ |_|_\  |_|
+=================================================================
+*/
+
+// ------------------
+// Requiring packages
+// ------------------
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
@@ -10,22 +25,33 @@ var xss = require('xss');
 var mongodb = require('mongodb').MongoClient;
 var dbURL = "mongodb://localhost:27017/blog_db";
 
+// ----------------
 // Setting the port
+// ----------------
 app.set('port', (process.env.PORT || 80));
 
-// Setup body parser
+// ----------------------------------
+// Setting up the body-parser package
+// ----------------------------------
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Setting up view engine
+// -----------------------------------------
+// Setting up the express-handlebars package
+// -----------------------------------------
 app.engine('hbs', hbs({extname: 'hbs',
                        defaultLayout: 'layout',
                        layoutsDir: __dirname + '/views/layouts/'}));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
-// --- Routing ---
-// Index page
+// =============
+// Begin routing
+// =============
+
+// -----------
+// Index route
+// -----------
 app.get(['/', '/home', '/index'], function(request, response) {
     response.render('index', {title: 'Steve Smart',
                               index: 'true',
@@ -33,7 +59,9 @@ app.get(['/', '/home', '/index'], function(request, response) {
                               js: ['index.js']});
 });
 
-// About page
+// -----------
+// About route
+// -----------
 app.get(['/about', '/me'], function(request, response) {
     response.render('about', {title: 'About Me',
                               about: 'true',
@@ -41,7 +69,9 @@ app.get(['/about', '/me'], function(request, response) {
                               js: ['about.js']});
 });
 
-// Resume page
+// ------------
+// Resume route
+// ------------
 app.get(['/resume', '/cv'], function(request, response) {
     response.render('resume', {title: 'Resume',
                                resume: 'true',
@@ -49,7 +79,9 @@ app.get(['/resume', '/cv'], function(request, response) {
                                js: ['resume.js']});
 });
 
-// Main blog page
+// ---------------
+// Blog main route
+// ---------------
 app.get(['/blog', '/journal', '/diary'], function(request, response) {
     response.render('blog', {title: 'Blog',
                              blog: 'true',
@@ -57,20 +89,33 @@ app.get(['/blog', '/journal', '/diary'], function(request, response) {
                              js: ['blog_main.js']});
 });
 
-// ### Individual blog pages ###
-// 1 - Introductory blog post
+// ======================
+// Begin blog post routes
+// ======================
+
+// ---------------------------------
+// #1: Introductory blog post routes
+// ---------------------------------
 app.get(['/blog/1', '/journal/1', '/diary/1'], function(request, response) {
+
+    // Connecting to local mongodb service
     mongodb.connect(dbURL, {useNewUrlParser: true}, function(error, client) {
         if (error) {
             response.status(500).render('errors/error500', {title: '500',
                                                             css: ['error.css']});
         }
+
+        // Grabbing db object
         var db = client.db('blog_db');
+
+        // Selecting relevant blog comments
         db.collection('blog_comments').find({blog_id: '1'}).sort({datetime: 1}).toArray(function(error, results) {
             if (error) {
                 response.status(500).render('errors/error500', {title: '500',
                                                                 css: ['error.css']});
             }
+
+            // Sending response back to the client
             response.render('blogs/1', {title: 'Introductory Blog Post',
                                         blog: 'true',
                                         css: ['blog_individual.css'],
@@ -84,17 +129,25 @@ app.get(['/blog/1', '/journal/1', '/diary/1'], function(request, response) {
 });
 
 app.post(['/blog/1'], function(request, response) {
+
+    // Connecting to local mongodb service
     mongodb.connect(dbURL, {useNewUrlParser: true}, function(error, client) {
         if (error) {
             response.status(500).render('errors/error500', {title: '500',
                                                             css: ['error.css']});
         }
+
+        // Grabbing db object
         var db = client.db('blog_db');
+
+        // Setting XSS prevention options
         var xssOptions = {
             whiteList: {
                 a: ["href"]
             }
         };
+
+        // Generating new comment object from post params
         var newComment = {
             blog_id: '1',
             name: sanitize(xss(request.body.name, xssOptions)),
@@ -103,11 +156,15 @@ app.post(['/blog/1'], function(request, response) {
             time: sanitize(xss(request.body.time, xssOptions)),
             comment: sanitize(xss(request.body.comment, xssOptions))
         };
+
+        // Inserting new comment into db
         db.collection('blog_comments').insertOne(newComment, function(error, result) {
             if (error) {
                 response.status(500).render('errors/error500', {title: '500',
                                                                 css: ['error.css']});
             }
+
+            // Sending updated comment data back to client
             db.collection('blog_comments').find({blog_id: '1'}).sort({datetime: 1}).toArray(function(error, results) {
                 if (error) {
                     response.status(500).render('errors/error500', {title: '500',
@@ -118,36 +175,58 @@ app.post(['/blog/1'], function(request, response) {
         });
     });
 });
-// ### End individual blog pages ###
 
-// Contact page
+// ====================
+// End blog post routes
+// ====================
+
+// -------------
+// Contact route
+// -------------
 app.get(['/contact', '/connect', '/socials'], function(request, response) {
     response.render('contact', {title: 'Contact Me',
                                 contact: 'true',
                                 css: ['contact.css'],
                                 js: ['contact.js']});
 });
-// --- End Routing ---
 
+// ===========
+// End routing
+// ===========
+
+// ------------------------------
 // Setting up static file service
+// ------------------------------
 app.use('/', express.static(__dirname + '/public'));
 
-// --- Error handling ---
-// 404 - page not found
+// ====================
+// Begin Error handling
+// ====================
+
+// --------------------------
+// Error 404 - Page not found
+// --------------------------
 app.use(function(request, response) {
     response.status(404).render('errors/error404', {title: '404',
                                                   css: ['error.css']});
 });
 
-// 500 - server error
+// ---------------------------------
+// Error 500 - Internal server error
+// ---------------------------------
 app.use(function(error, request, response, next) {
     console.log(error);
     response.status(500).render('errors/error500', {title: '500',
                                                   css: ['error.css']});
 });
-// --- End error handling
 
+// ==================
+// End Error handling
+// ==================
+
+// ---------------
 // Starting server
+// ---------------
 http.listen(app.get('port'), function() {
     console.log(`Server started on port ${app.get('port')}`);
 });

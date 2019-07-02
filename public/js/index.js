@@ -1,4 +1,24 @@
+/*
+=================================================================
+ (                              (       *             (            
+ )\ )  *   )                    )\ )  (  `     (      )\ )  *   )  
+(()/(` )  /( (    (   (   (    (()/(  )\))(    )\    (()/(` )  /(  
+ /(_))( )(_)))\   )\  )\  )\    /(_))((_)()\((((_)(   /(_))( )(_)) 
+(_)) (_(_())((_) ((_)((_)((_)  (_))  (_()((_))\ _ )\ (_)) (_(_())  
+/ __||_   _|| __|\ \ / / | __| / __| |  \/  |(_)_\(_)| _ \|_   _|  
+\__ \  | |  | _|  \ V /  | _|  \__ \ | |\/| | / _ \  |   /  | |    
+|___/  |_|  |___|  \_/   |___| |___/ |_|  |_|/_/ \_\ |_|_\  |_|
+=================================================================
+*/
+
+// ==========================
+// Begin function definitions
+// ==========================
+
+
+// -----------------------------------------------
 // Animates centerpiece text with colorful letters
+// -----------------------------------------------
 function colorizeCenterpieceText() {
     var color1 = '#F44336';
     var color2 = '#009688';
@@ -12,10 +32,12 @@ function colorizeCenterpieceText() {
 
     $('#centerpiece span').each(function(index, span) {
         span.style = `color: ${textColorsShuffled[index]}`;
-     });
+    });
 }
 
-// Detect if the current device is a touch screen
+// -----------------------------------------------
+// Detects if the current device is a touch screen
+// -----------------------------------------------
 function isTouchDevice() {
     var prefixes = ' -webkit- -moz- -o- -ms- '.split(' ');
     var mq = function(query) {
@@ -30,31 +52,748 @@ function isTouchDevice() {
     return mq(query);
 }
 
-// --------------------------
+// ===============================
+// Begin PIXI function definitions
+// ===============================
 
+// -----------------------
+// Mage object constructor
+// -----------------------
+function Mage() {
+
+    // ------
+    // Fields
+    // ------
+
+    this.mobileScale = 0.05;
+    this.tabletScale = 0.19;
+    this.desktopScale = 0.25;
+
+    this.maxXSpeed = 6;
+    this.xAcceleration = 1.5;
+
+    this.leftPressed = false;
+    this.rightPressed = false;
+    this.jumpPressed = false;
+
+    this.dead = false;
+
+    this.yResizeOffset = 0;
+
+    this.sprite = null;
+
+    this.instructions = null;
+
+    this.images = {
+        walkingRight: ['/img/sprites/mage_right.png'],
+        walkingLeft: ['/img/sprites/mage_left.png'],
+        castingRight: ['/img/sprites/mage_cast_right0.png',
+                       '/img/sprites/mage_cast_right0.png',
+                       '/img/sprites/mage_cast_right1.png'],
+        castingLeft: ['/img/sprites/mage_cast_left0.png',
+                      '/img/sprites/mage_cast_left0.png',
+                      '/img/sprites/mage_cast_left1.png']
+    };
+
+    this.textures = {
+        walkingRight: [],
+        walkingLeft: [],
+        castingRight: [],
+        castingLeft: []
+    };
+
+    this.defaultTextures = this.textures.walkingRight;
+
+    // -------
+    // Methods
+    // -------
+
+    this.reScale = function() {
+        if ($(window).width() <= MOBILE_MAX_WIDTH) {
+            this.sprite.scale.set(this.mobileScale);
+        }
+        else if ($(window).width() <= TABLET_MAX_WIDTH) {
+            this.sprite.scale.set(this.tabletScale);
+        }
+        else {
+            this.sprite.scale.set(this.desktopScale);
+        }
+    };
+
+    this.update = function() {
+        if ((this.leftPressed == true) && (this.rightPressed == false)) {
+            if (this.sprite.textures == this.textures.walkingRight) {
+                this.sprite.textures = this.textures.walkingLeft;
+            }
+            this.sprite.ax = -this.xAcceleration;
+        }
+        else if ((this.leftPressed == false) && (this.rightPressed == true)) {
+            if (this.sprite.textures == this.textures.walkingLeft) {
+                this.sprite.textures = this.textures.walkingRight;
+            }
+            this.sprite.ax = this.xAcceleration;
+        }
+        else {
+            this.sprite.ax = 0;
+        }
+
+        if (this.sprite.vy == 0) { 
+            this.jumping = false;
+        }
+        else {
+            this.jumping = true;
+        }
+
+        if (this.sprite.vx < 0) {
+            this.sprite.vx += this.sprite.ax + FRICTION;
+            if (this.sprite.vx < -(this.maxXSpeed)) {
+                this.sprite.vx = -this.maxXSpeed;
+            }
+        }
+        else if (this.sprite.vx > 0) {
+            this.sprite.vx += this.sprite.ax - FRICTION;
+            if (this.sprite.vx > this.maxXSpeed) {
+                this.sprite.vx = this.maxXSpeed;
+            }
+        }
+        else {
+            this.sprite.vx += this.sprite.ax;
+        }
+
+        this.sprite.vy += this.sprite.ay + GRAVITY;
+
+        this.sprite.x += this.sprite.vx;
+        this.sprite.y += this.sprite.vy;
+
+        if (this.instructions != null) {
+            this.instructions.update();
+        }
+
+        this.checkCollision();
+    };
+
+    this.updateOnResize = function() {
+        let xPositionRatio = this.sprite.x / app.renderer.view.width;
+        let yPositionRatio = this.sprite.y / app.renderer.view.height;
+
+        this.reScale();
+
+        if ((app.renderer.view.width <= MOBILE_MAX_WIDTH) && ($(window).width() > MOBILE_MAX_WIDTH)) {
+            this.yResizeOffset = 15;
+        }
+        else if ((app.renderer.view.width <= TABLET_MAX_WIDTH) && ($(window).width() > TABLET_MAX_WIDTH)) {
+            this.yResizeOffset = 45;
+        }
+        else if ((app.renderer.view.width <= MOBILE_MAX_WIDTH) && ($(window).width() > TABLET_MAX_WIDTH)) {
+            this.yResizeOffset = 85;
+        }
+        else {
+            this.yResizeOffset = 0;
+        }
+
+        this.sprite.x = xPositionRatio * $(window).width();
+        this.sprite.y = (yPositionRatio * $(window).height()) - this.yResizeOffset;
+
+        if (this.instructions != null) {
+            this.instructions.updateOnResize();
+        }
+    };
+
+    this.checkCollision = function() {
+        let centerpieceOffset = $('#centerpiece').offset();
+        let centerPieceTopPosition = centerpieceOffset.top + 5;
+        let centerpieceLeftPosition = centerpieceOffset.left;
+        let centerpieceRightPosition = centerpieceOffset.left + $('#centerpiece').width();
+        let centerpieceBottomPosition = centerpieceOffset.top + $('#centerpiece').height();
+        let centerpieceTopCollisionOffset = 16;
+        let blastZoneBottomOffset = 50;
+        
+        if (((this.sprite.x + (this.sprite.width / 2)) > centerpieceLeftPosition) && ((this.sprite.x - (this.sprite.width / 2)) < centerpieceRightPosition)) {
+            if ((this.sprite.y >= centerPieceTopPosition) && (this.sprite.y <= centerpieceBottomPosition) && (this.sprite.y < (centerPieceTopPosition + centerpieceTopCollisionOffset))) {
+                this.sprite.y = centerPieceTopPosition;
+                this.sprite.vy = 0;
+            }
+        }
+
+        if ((this.sprite.y > centerPieceTopPosition) && (this.sprite.y - this.sprite.height) < centerpieceBottomPosition) {
+            if (((this.sprite.x + (this.sprite.width / 2)) > centerpieceLeftPosition) && (this.sprite.x < ($(window).width() / 2))) {
+                this.sprite.x = centerpieceLeftPosition - (this.sprite.width / 2);
+                this.sprite.vx = 0;
+            }
+            else if (((this.sprite.x - (this.sprite.width / 2)) < centerpieceRightPosition) && (this.sprite.x >= ($(window).width() / 2))) {
+                this.sprite.x = centerpieceRightPosition + (this.sprite.width / 2);
+                this.sprite.vx = 0;
+            }
+        }
+
+        if ((this.sprite.y - this.sprite.height - blastZoneBottomOffset) > $(window).height()) {
+            this.kill();
+        }
+    };
+
+    this.kill = function() {
+        app.stage.removeChild(this.sprite);
+
+        this.dead = true;
+
+        if (this.instructions != null) {
+            app.stage.removeChild(this.instructions.sprite);
+            this.instructions.sprite = null;
+            this.instructions = null;
+        }
+
+        if (playSound) {
+            deathSound.pause();
+            deathSound.currentTime = 0;
+            deathSound.play();
+        }
+    };
+
+    this.jump = function() {
+        this.sprite.vy = -13;
+    };
+
+    this.castSpell = function(targetX, targetY) {
+        this.sprite.loop = false;
+        this.sprite.onComplete = function() {
+            if (mage != null) {
+                if (mage.sprite.textures == mage.textures.castingRight) {
+                    mage.sprite.textures = mage.textures.walkingRight;
+                }
+                else {
+                    mage.sprite.textures = mage.textures.walkingLeft;
+                }
+            }
+        };
+        if (targetX >= this.sprite.x) {
+            this.sprite.textures = this.textures.castingRight;
+            this.sprite.play();
+        }
+        else {
+            this.sprite.textures = this.textures.castingLeft;
+            this.sprite.play();
+        }
+
+        spell = new Spell(this, targetX, targetY);
+        spell.init();
+    };
+
+    this.init = function() { 
+        for (let key in this.images) {
+            for (let i = 0; i < this.images[key].length; i++) {
+                this.textures[key].push(Texture.from(this.images[key][i]));
+            }
+        }
+
+        this.sprite = new AnimatedSprite(this.defaultTextures);
+
+        this.reScale();
+
+        this.sprite.anchor.x = 0.5;
+        this.sprite.anchor.y = 1;
+        this.sprite.x = (app.renderer.view.width / 2);
+        this.sprite.y = ($('#centerpiece').offset().top + 5);
+        this.sprite.vx = 0;
+        this.sprite.vy = 0;
+        this.sprite.ax = 0;
+        this.sprite.ay = 0;
+        this.sprite.animationSpeed = 0.2;
+
+        app.stage.addChild(this.sprite);
+    };
+};
+
+// -------------------------------
+// Instructions object constructor
+// -------------------------------
+function Instructions(mage) {
+
+    // ------
+    // Fields
+    // ------
+
+    this.mobileScale = 0.05;
+    this.tabletScale = 0.30;
+    this.desktopScale = 0.40;
+
+    this.xOffset = 0;
+
+    this.mage = mage;
+
+    this.sprite = null;
+
+    this.images = {
+        standard: ['/img/sprites/instructions_desktop.png'],
+        touch: ['/img/sprites/instructions_touch.png']
+    };
+
+    this.textures = {
+        standard: [],
+        touch: []
+    };
+
+    this.defaultTextures = this.textures.standard;
+
+    // -------
+    // Methods
+    // -------
+
+    this.reScale = function() {
+        if ($(window).width() <= MOBILE_MAX_WIDTH) {
+            this.sprite.scale.set(this.mobileScale);
+            this.xOffset = 0;
+        }
+        else if ($(window).width() <= TABLET_MAX_WIDTH) {
+            this.sprite.scale.set(this.tabletScale);
+            this.xOffset = 50;
+        }
+        else {
+            this.sprite.scale.set(this.desktopScale);
+            this.xOffset = 70;
+        }
+    };
+
+    this.update = function() {
+        this.sprite.x = this.mage.sprite.x + this.xOffset;
+        this.sprite.y = this.mage.sprite.y - this.mage.sprite.height;
+    };
+
+    this.updateOnResize = function() {
+        this.reScale();
+        this.update();
+    };
+
+    this.init = function() {
+        for (let key in this.images) {
+            for (let i = 0; i < this.images[key].length; i++) {
+                this.textures[key].push(Texture.from(this.images[key][i]));
+            }
+        }
+
+        if (isTouchDevice() == true) {
+            this.defaultTextures = this.textures.touch;
+        }
+
+        this.sprite = new AnimatedSprite(this.defaultTextures);
+
+        this.reScale();
+
+        this.sprite.anchor.x = 0.5;
+        this.sprite.anchor.y = 1;
+        this.sprite.x = this.mage.sprite.x + this.xOffset;
+        this.sprite.y = this.mage.sprite.y - this.mage.sprite.height;
+
+        app.stage.addChild(this.sprite);
+    };
+}
+
+// ------------------------
+// Spell object constructor
+// ------------------------
+function Spell(mage, targetX, targetY) {
+
+    // ------
+    // Fields
+    // ------
+
+    this.mobileScale = 0.05;
+    this.tabletScale = 1.9;
+    this.desktopScale = 2.5;
+
+    this.targetX = targetX;
+    this.targetY = targetY;
+
+    this.speed = 3;
+    this.acceleration = 0.15;
+    this.rotationSpeed = 40;
+
+    this.collidedNavElement = null;
+
+    this.mage = mage;
+
+    this.sprite = null;
+
+    this.images = {
+        standard: ['/img/sprites/spell.png'],
+        collision: ['/img/sprites/spell_collision0.png',
+                    '/img/sprites/spell_collision1.png',
+                    '/img/sprites/spell_collision2.png',
+                    '/img/sprites/spell_collision3.png',
+                    '/img/sprites/spell_collision4.png',
+                    '/img/sprites/spell_collision5.png',
+                    '/img/sprites/spell_collision6.png',
+                    '/img/sprites/spell_collision7.png']
+    };
+
+    this.textures = {
+        standard: [],
+        collision: []
+    };
+
+    this.defaultTextures = this.textures.standard;
+
+    // -------
+    // Methods
+    // -------
+
+    this.reScale = function() {
+        if ($(window).width() <= MOBILE_MAX_WIDTH) {
+            this.sprite.scale.set(this.mobileScale);
+        }
+        else if ($(window).width() <= TABLET_MAX_WIDTH) {
+            this.sprite.scale.set(this.tabletScale);
+        }
+        else {
+            this.sprite.scale.set(this.desktopScale);
+        }
+    };
+
+    this.update = function() {
+        this.sprite.vx += this.sprite.ax;
+        this.sprite.vy += this.sprite.ay;
+
+        this.sprite.x += this.sprite.vx;
+        this.sprite.y += this.sprite.vy;
+
+        this.sprite.angle += this.rotationSpeed;
+
+        this.checkCollision();
+    };
+
+    this.updateOnResize = function() {
+        if ($(window).width() <= MOBILE_MAX_WIDTH) {
+            app.stage.removeChild(this.sprite);
+        }
+    }
+
+    this.checkNavCollision = function(navElement) {
+        let navTop = navElement.offsetTop;
+        let navBottom = navTop + navElement.offsetHeight;
+        let navLeft = navElement.offsetLeft;
+        let navRight = navLeft + navElement.offsetWidth;
+        
+        if ((this.sprite.x >= navLeft) && (this.sprite.x <= navRight) && (this.sprite.y >= navTop) && (this.sprite.y <= navBottom)) {
+            this.sprite.textures = this.textures.collision;
+            this.sprite.onComplete = function() {
+                if (playSound == false) {
+                    spell.collidedNavElement.firstChild.click();
+                }
+            };
+            this.rotationSpeed = 0;
+            this.sprite.ax = 0;
+            this.sprite.ay = 0;
+            this.sprite.vx = 0;
+            this.sprite.vy = 0;
+            this.sprite.animationSpeed = 0.8;
+            this.sprite.loop = false;
+
+            this.collidedNavElement = navElement;
+
+            this.sprite.play();
+
+            if (playSound == true) {
+                spellCollideSound.pause();
+                spellCollideSound.currentTime = 0;
+                spellCollideSound.play();
+            }
+        }
+    };
+
+    this.checkCollision = function() {
+        let navElements = $('.navlinks li').toArray();
+        if (this.collidedNavElement == null) {
+            for (let i = 0; i < navElements.length; i++) {
+                this.checkNavCollision(navElements[i]);
+            }
+        }
+
+        let spellBlastZoneOffset = 10;
+        if ((this.sprite.x > ($(window).width() + spellBlastZoneOffset))
+            || (this.sprite.x < (-spellBlastZoneOffset))
+            || (this.sprite.y > ($(window).height() + spellBlastZoneOffset))
+            || (this.sprite.y < (-spellBlastZoneOffset))) {
+
+            app.stage.removeChild(this.sprite);
+            this.sprite = null;
+        }
+    };
+
+    this.init = function() {
+        for (let key in this.images) {
+            for (let i = 0; i < this.images[key].length; i++) {
+                this.textures[key].push(Texture.from(this.images[key][i]));
+            }
+        }
+
+        this.sprite = new AnimatedSprite(this.defaultTextures);
+
+        this.reScale();
+
+        this.sprite.anchor.x = 0.5;
+        this.sprite.anchor.y = 0.5;
+        this.sprite.x = this.mage.sprite.x;
+        this.sprite.y = this.mage.sprite.y - (this.mage.sprite.width / 2);
+
+        let dx = this.targetX - this.sprite.x;
+        let dy = this.targetY - this.sprite.y;
+        let distance = Math.sqrt(dx*dx + dy*dy);
+
+        this.sprite.vx = (dx / distance) * this.speed;
+        this.sprite.vy = (dy / distance) * this.speed;
+        this.sprite.ax = this.sprite.vx * this.acceleration;
+        this.sprite.ay = this.sprite.vy * this.acceleration;
+        this.sprite.animationSpeed = 0.2;
+
+        app.stage.addChild(this.sprite);
+        this.sprite.play();
+
+        if (playSound) {
+            spellSound.pause();
+            spellSound.currentTime = 0;
+            spellSound.play();
+        }
+    };
+}
+
+// --------------------------------------
+// Creates a key object for the given key
+// --------------------------------------
+function createKey(value) {
+    let key = {};
+    key.value = value;
+    key.isDown = false;
+    key.isUp = true;
+    key.press = undefined;
+    key.release = undefined;
+    
+    // The down handler
+    key.downHandler = event => {
+        if (event.key === key.value) {
+            if (key.isUp && key.press) key.press();
+            key.isDown = true;
+            key.isUp = false;
+            event.preventDefault();
+        }
+    };
+
+    // The up handler
+    key.upHandler = event => {
+        if (event.key === key.value) {
+            if (key.isDown && key.release) key.release();
+            key.isDown = false;
+            key.isUp = true;
+            event.preventDefault();
+        }
+    };
+
+    // Attaching event listeners
+    const downListener = key.downHandler.bind(key);
+    const upListener = key.upHandler.bind(key);
+
+    window.addEventListener(
+        "keydown", downListener, false
+    );
+    window.addEventListener(
+        "keyup", upListener, false
+    );
+
+    // Detaching event listeners
+    key.unsubscribe = () => {
+        window.removeEventListener("keydown", downListener);
+        window.removeEventListener("keyup", upListener);
+    };
+
+    return key;
+}
+
+// -------------------------------------------------------------------------
+// Handles game logic when any key mapped to the move left action is pressed
+// -------------------------------------------------------------------------
+function leftPressed() {
+    if (mage != null) {
+        mage.leftPressed = true;
+        if (mage.instructions != null) {
+            app.stage.removeChild(mage.instructions.sprite);
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// Handles game logic when any key mapped to the move left action is released
+// --------------------------------------------------------------------------
+function leftReleased() {
+    if (mage != null) {
+        mage.leftPressed = false;
+    }
+}
+
+// --------------------------------------------------------------------------
+// Handles game logic when any key mapped to the move right action is pressed
+// --------------------------------------------------------------------------
+function rightPressed() {
+    if (mage != null) {
+        mage.rightPressed = true;
+        if (mage.instructions != null) {
+            app.stage.removeChild(mage.instructions.sprite);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Handles game logic when any key mapped to the move right action is released
+// ---------------------------------------------------------------------------
+function rightReleased() {
+    if (mage != null) {
+        mage.rightPressed = false;
+    }
+}
+
+// --------------------------------------------------------------------
+// Handles game logic when any key mapped to the jump action is pressed
+// --------------------------------------------------------------------
+function jumpPressed() {
+    if (mage != null) {
+        if (mage.jumping == false) { 
+            mage.jump();
+        }
+        if (mage.instructions != null) {
+            app.stage.removeChild(mage.instructions.sprite);
+        }
+    }
+}
+
+// ----------------
+// Sets up the game
+// ----------------
+function setup() {
+    if ($(window).width() > MOBILE_MAX_WIDTH) {
+        mage = new Mage();
+        mage.init();
+
+        mage.instructions = new Instructions(mage);
+        mage.instructions.init();
+
+        document.body.appendChild(app.view);
+    }
+
+    app.ticker.add(delta => gameLoop(delta));
+}
+
+// ---------------------------------------------------------
+// Executes every 60 times per second and updates game state
+// ---------------------------------------------------------
+function gameLoop() {
+    if (mage != null) {
+        if (mage.dead == false) {
+            mage.update();
+        }
+    }
+
+    if (spell != null) {
+        if (spell.sprite == null) {
+            spell = null;
+        }
+        else {
+            spell.update();
+        }
+    }
+}
+
+// ---------------------------------
+// Updates the game on window resize
+// ---------------------------------
+function updateOnResize() {
+    if (mage != null) {
+
+        mage.updateOnResize();
+    }
+
+    if ((app.renderer.view.width > MOBILE_MAX_WIDTH) && ($(window).width() <= MOBILE_MAX_WIDTH)) {
+        app.stage.removeChildren();
+        document.body.removeChild(app.view);
+        if (mage.instructions != null) {
+            mage.instructions.sprite = null;
+            mage.instructions = null;
+        }
+        if (mage != null) {
+            mage.sprite = null;
+            mage = null;
+        }
+        if (spell != null) {
+            spell.sprite = null;
+            spell = null;
+        }
+    }
+    else if ((app.renderer.view.width <= MOBILE_MAX_WIDTH) && ($(window).width() > MOBILE_MAX_WIDTH)) {
+
+        setTimeout(function() {
+            mage = new Mage();
+            mage.init();
+
+            mage.instructions = new Instructions(mage);
+            mage.instructions.init();
+
+            document.body.appendChild(app.view);
+        }, 250);
+    }
+
+    if (spell != null) {
+        spell.updateOnResize();
+    }
+
+    app.renderer.resize($(window).width(), $(window).height());
+}
+
+// --------------------
+// Handles click events
+// --------------------
+function clickHandler() {
+    if ((spell != null) || (mage == null) || (mage.sprite == null) || (mage.dead == true)) {
+        return;
+    }
+
+    if (mage.instructions != null) {
+        app.stage.removeChild(mage.instructions.sprite);
+    }
+
+    let targetX = event.clientX;
+    let targetY = event.clientY;
+
+    mage.castSpell(targetX, targetY);
+}
+
+// =============================
+// End PIXI function definitions
+// =============================
+
+// ========================
+// End function definitions
+// ========================
+
+// ============
 // Begin script
+// ============
+
+// ------------------------------------------------------------------
+// Preventing clicking the links from generating further click events
+// ------------------------------------------------------------------
 $('a').click(function() {
     event.stopPropagation();
 })
 
-// Setting up sound effects
-let playSound = false;
-let soundtrack = new Audio('/sound/soundtrack.mp3'); 
-soundtrack.volume = 0.08;
-soundtrack.loop = true;
+// ---------------------------------------------
+// Animating centerpiece text with pretty colors
+// ---------------------------------------------
+colorizeCenterpieceText();
+setInterval(colorizeCenterpieceText, 333);
 
-let spellSound = new Audio('/sound/spell.wav');
-spellSound.volume = 0.05;
+// =========================
+// Begin sound effects setup
+// =========================
 
-let spellCollideSound = new Audio('/sound/spell_collide.wav');
-spellCollideSound.volume = 0.3;
-spellCollideSound.addEventListener('ended', function() {
-    collidedNavElement.firstChild.click();
-});
-
-let deathSound = new Audio('/sound/death2.wav');
-deathSound.volume = 0.3;
-
+// -----------------------------------------------------------
+// Registering click listener for the mute/unmute sound button
+// -----------------------------------------------------------
 $('#mute-sound img').click(function() {
 
     $('.speaker-img').each(function() {
@@ -77,624 +816,116 @@ $('#mute-sound img').click(function() {
     event.stopPropagation();
 })
 
-// Animate centerpiece text
-colorizeCenterpieceText();
-setInterval(colorizeCenterpieceText, 333);
+// ---------------------
+// Setting up soundtrack
+// ---------------------
+var playSound = false;
+var soundtrack = new Audio('/sound/soundtrack.mp3'); 
+soundtrack.volume = 0.08;
+soundtrack.loop = true;
 
-// --- PIXI code ---
+// ----------------------
+// Setting up spell sound
+// ----------------------
+var spellSound = new Audio('/sound/spell.wav');
+spellSound.volume = 0.05;
+
+// --------------------------------
+// Setting up spell collision sound
+// --------------------------------
+var spellCollideSound = new Audio('/sound/spell_collide.wav');
+spellCollideSound.volume = 0.3;
+spellCollideSound.addEventListener('ended', function() {
+    spell.collidedNavElement.firstChild.click();
+});
+
+// ---------------------------
+// Setting up mage death sound
+// ---------------------------
+var deathSound = new Audio('/sound/death2.wav');
+deathSound.volume = 0.3;
+
+// =======================
+// End sound effects setup
+// =======================
+
+// =================
+// Begin PIXI script
+// =================
+
+// ---------
+// Constants
+// ---------
+var MOBILE_MAX_WIDTH = 768;
+var TABLET_MAX_WIDTH = 1440;
+var FRICTION = 0.5;
+var GRAVITY = 0.7;
+
+// -------
 // Aliases
-let Application = PIXI.Application;
-let Loader = PIXI.Loader.shared;
-let Texture = PIXI.Texture;
-let Sprite = PIXI.Sprite;
-let AnimatedSprite = PIXI.AnimatedSprite;
+// -------
+var Application = PIXI.Application;
+var Loader = PIXI.Loader.shared;
+var Texture = PIXI.Texture;
+var Sprite = PIXI.Sprite;
+var AnimatedSprite = PIXI.AnimatedSprite;
 
-// Create a Pixi Application
-let app = new Application({transparent: true});
+// ---------------------------
+// Creating a Pixi Application
+// ---------------------------
+var app = new Application({transparent: true});
 app.renderer.view.style.position = "absolute";
 app.renderer.view.style.top = "0";
 app.renderer.view.style.left = "0";
 app.renderer.view.style.display = "block";
 app.renderer.autoDensity = true;
 app.renderer.resize($(window).width(), $(window).height());
-document.body.appendChild(app.view);
 
-// Game constants
-const gravity = 0.7;
-const friction = 0.5;
-const maxXSpeed = 6;
-var mageDied = false;
-var collidedNavElement = null;
-var addGameLoop = true;
-
-$(window).resize(resizeUpdate);
-
-// Mage sprite and textures
-let mage = null;
-
-let mageWalkingRightImgs = ['/img/sprites/mage_right.png'];
-let mageWalkingRightTextures = [];
-for (let i=0; i < mageWalkingRightImgs.length; i++) {
-    mageWalkingRightTextures.push(Texture.from(mageWalkingRightImgs[i]));
-}
-
-let mageWalkingLeftImgs = ['/img/sprites/mage_left.png'];
-let mageWalkingLeftTextures = [];
-for (let i=0; i < mageWalkingLeftImgs.length; i++) {
-    mageWalkingLeftTextures.push(Texture.from(mageWalkingLeftImgs[i]));
-}
-
-let mageCastingRightImgs = ['/img/sprites/mage_cast_right0.png',
-                            '/img/sprites/mage_cast_right0.png',
-                            '/img/sprites/mage_cast_right1.png'];
-let mageCastingRightTextures = [];
-for (let i=0; i < mageCastingRightImgs.length; i++) {
-    mageCastingRightTextures.push(Texture.from(mageCastingRightImgs[i]));
-}
-
-let mageCastingLeftImgs = ['/img/sprites/mage_cast_left0.png',
-                           '/img/sprites/mage_cast_left0.png',
-                           '/img/sprites/mage_cast_left1.png'];
-let mageCastingLeftTextures = [];
-for (let i=0; i < mageCastingLeftImgs.length; i++) {
-    mageCastingLeftTextures.push(Texture.from(mageCastingLeftImgs[i]));
-}
-
-// Spell sprite and textures
-let spell = null;
-
-let spellImgs = ['/img/sprites/spell.png'];
-
-let spellTextures = [];
-for (let i=0; i < spellImgs.length; i++) {
-    spellTextures.push(Texture.from(spellImgs[i]));
-}
-
-let spellCollisionImgs = ['/img/sprites/spell_collision0.png',
-                          '/img/sprites/spell_collision1.png',
-                          '/img/sprites/spell_collision2.png',
-                          '/img/sprites/spell_collision3.png',
-                          '/img/sprites/spell_collision4.png',
-                          '/img/sprites/spell_collision5.png',
-                          '/img/sprites/spell_collision6.png',
-                          '/img/sprites/spell_collision7.png'];
-let spellCollisionTextures = [];
-for (let i=0; i < spellCollisionImgs.length; i++) {
-    spellCollisionTextures.push(Texture.from(spellCollisionImgs[i]));
-}
-
-// Instructions sprite and textures
-let instructions = null;
-
-let displayInstructions = true;
-
-let instructionsImgs = ['/img/sprites/instructions_desktop.png'];
-
-if ($(window).width() <= 768) {
-    instructionsXOffset = 0;
-}
-else if ($(window).width() <= 1440) {
-    instructionsXOffset = 50;
-}
-else {
-    instructionsXOffset = 70;
-}
-
-if (isTouchDevice() == true) {
-    instructionsImgs = ['/img/sprites/instructions_touch.png'];
-}
-let instructionsTextures = [];
-for (let i=0; i < instructionsImgs.length; i++) {
-    instructionsTextures.push(Texture.from(instructionsImgs[i]));
-}
-
-// Keyboard objects
-lowerA = keyboard('a');
-upperA = keyboard('A');
-lowerD = keyboard('d');
-upperD = keyboard('D');
-space = keyboard(' ');
-
-// Load sprite image as texture and create sprite
-if ($(window).width() > 768) {
-    Loader.add([]).load(setup);
-}
-
-function setup() {
-
-    // Setting up the mage sprite
-    mage = new AnimatedSprite(mageWalkingRightTextures);
-    
-    // Rescale the mage based on window width
-    if ($(window).width() <= 768) {
-        mage.scale.set(0.05);
-    }
-    else if ($(window).width() <= 1440) {
-        mage.scale.set(0.19);
-    }
-    else {
-        mage.scale.set(0.25);
-    }
-
-    mage.anchor.x = 0.5;
-    mage.anchor.y = 1;
-    mage.x = app.renderer.view.width / 2;
-    mage.y = $('#centerpiece').offset().top + 5;
-    mage.vx = 0;
-    mage.vy = 0;
-    mage.ax = 0;
-    mage.ay = 0;
-    mage.leftPressed = false;
-    mage.rightPressed = false;
-    mage.jumping = false;
-    mage.animationSpeed = 0.2;
-
-    lowerA.press = leftPressed;
-    upperA.press = leftPressed;
-    lowerA.release = leftReleased;
-    upperA.release = leftReleased;
-
-    lowerD.press = rightPressed;
-    upperD.press = rightPressed;
-    lowerD.release = rightReleased;
-    upperD.release = rightReleased;
-
-    space.press = jumpPressed;
-
-    // Adding the mage sprite to the stage
-    app.stage.addChild(mage);
-
-    // Display instructions if needed
-    if (displayInstructions) {
-        instructions = new AnimatedSprite(instructionsTextures);
-
-        if ($(window).width() <= 768) {
-            instructions.scale.set(0.05);
-            instructionsXOffset = 0;
-        }
-        else if ($(window).width() <= 1440) {
-            instructions.scale.set(0.30);
-            instructionsXOffset = 50;
-        }
-        else {
-            instructions.scale.set(0.40);
-            instructionsXOffset = 70;
-        }
-
-        instructions.anchor.x = 0.5;
-        instructions.anchor.y = 1;
-        instructions.x = mage.x + instructionsXOffset;
-        instructions.y = mage.y - mage.height;
-
-        app.stage.addChild(instructions);
-    }
-
-    // Register event listener for casting a spell
-    $(document).click(castSpell);
-
-    // Start the game loop
-    if (addGameLoop) {
-        app.ticker.add(delta => gameLoop(delta));
-        addGameLoop = false;
-    }
-}
-
-function gameLoop(delta) {
-    if (mage) {
-        if ((mage.leftPressed == true) && (mage.rightPressed == false)) {
-            if (mage.textures == mageWalkingRightTextures) {
-                mage.textures = mageWalkingLeftTextures;
-            }
-            mage.ax = -1.5;
-        }
-        else if ((mage.leftPressed == false) && (mage.rightPressed == true)) {
-            if (mage.textures == mageWalkingLeftTextures) {
-                mage.textures = mageWalkingRightTextures;
-            }
-            mage.ax = 1.5;
-        }
-        else {
-            mage.ax = 0;
-        }
-
-        if (mage.vy == 0) { 
-            mage.jumping = false;
-        }
-        else {
-            mage.jumping = true;
-        }
-
-        if (mage.vx < 0) {
-            mage.vx += mage.ax + friction;
-            if (mage.vx < -(maxXSpeed)) {
-                mage.vx = -maxXSpeed;
-            }
-        }
-        else if (mage.vx > 0) {
-            mage.vx += mage.ax - friction;
-            if (mage.vx > maxXSpeed) {
-                mage.vx = maxXSpeed;
-            }
-        }
-        else {
-            mage.vx += mage.ax;
-        }
-
-        mage.vy += mage.ay + gravity;
-
-        mage.x += mage.vx;
-        mage.y += mage.vy;
-
-        if (displayInstructions) {
-            instructions.x = mage.x + instructionsXOffset;
-            instructions.y = mage.y - mage.height;
-        }
-
-        checkMageCollision();
-    }
-
-    if (spell) {
-        spell.vx += spell.ax;
-        spell.vy += spell.ay;
-
-        spell.x += spell.vx;
-        spell.y += spell.vy;
-
-        spell.angle += spell.rotationSpeed;
-
-        checkSpellCollision();
-    }
-}
-
-function checkMageCollision() {
-    var centerpieceOffset = $('#centerpiece').offset();
-    var centerPieceTopPosition = centerpieceOffset.top + 5;
-    var centerpieceLeftPosition = centerpieceOffset.left;
-    var centerpieceRightPosition = centerpieceOffset.left + $('#centerpiece').width();
-    var centerpieceBottomPosition = centerpieceOffset.top + $('#centerpiece').height();
-    
-    if (((mage.x + (mage.width / 2)) > centerpieceLeftPosition) && ((mage.x - (mage.width / 2)) < centerpieceRightPosition)) {
-        if ((mage.y >= centerPieceTopPosition) && (mage.y <= centerpieceBottomPosition) && (mage.y < (centerPieceTopPosition + 16))) {
-            mage.y = centerPieceTopPosition;
-            mage.vy = 0;
-        }
-    }
-
-    if ((mage.y > centerPieceTopPosition) && (mage.y - mage.height) < centerpieceBottomPosition) {
-        if (((mage.x + (mage.width / 2)) > centerpieceLeftPosition) && (mage.x < ($(window).width() / 2))) {
-            mage.x = centerpieceLeftPosition - (mage.width / 2);
-            mage.vx = 0;
-        }
-        else if (((mage.x - (mage.width / 2)) < centerpieceRightPosition) && (mage.x >= ($(window).width() / 2))) {
-            mage.x = centerpieceRightPosition + (mage.width / 2);
-            mage.vx = 0;
-        }
-    }
-
-    // Check if mage is dead off the bottom
-    if ((mage.y - mage.height - 50) > $(window).height()) {
-        killMage();
-    }
-}
-
-function checkSpellCollision() {
-
-    let navElements = $('.navlinks li').toArray();
-    if (!collidedNavElement) {
-        for (let i = 0; i < navElements.length; i++) {
-            checkSpellNavCollision(navElements[i]);
-        }
-    }
-
-    if ((spell.x > ($(window).width() + 10))
-        || (spell.x < (-10))
-        || (spell.y > ($(window).height() + 10))
-        || (spell.y < (-10))) {
-
-        app.stage.removeChild(spell);
-        spell = null;
-    }
-}
-
-function spellCollisionComplete() {
-    if (!playSound) {
-        collidedNavElement.firstChild.click();
-    }
-}
-
-function checkSpellNavCollision(navElement) {
-    let navTop = navElement.offsetTop;
-    let navBottom = navTop + navElement.offsetHeight;
-    let navLeft = navElement.offsetLeft;
-    let navRight = navLeft + navElement.offsetWidth;
-    
-    if ((spell.x >= navLeft) && (spell.x <= navRight) && (spell.y >= navTop) && (spell.y <= navBottom)) {
-        spell.textures = spellCollisionTextures;
-        spell.onComplete = spellCollisionComplete;
-        spell.rotationSpeed = 0;
-        spell.ax = 0;
-        spell.ay = 0;
-        spell.vx = 0;
-        spell.vy = 0;
-        spell.animationSpeed = 0.8;
-        spell.loop = false;
-
-        collidedNavElement = navElement;
-
-        spell.play();
-
-        if (playSound) {
-            spellCollideSound.pause();
-            spellCollideSound.currentTime = 0;
-            spellCollideSound.play();
-        }
-    }
-}
-
-function resizeUpdate() {
-    if (mage) {
-
-        if ($(window).width() <= 768) {
-            app.stage.removeChild(mage);
-            if (spell) { app.stage.removeChild(spell); }
-            document.body.removeChild(app.view);
-            app = null;
-            mage = null;
-            spell = null;
-            instructions = null;
-            lowerA.press = null;
-            upperA.press = null;
-            lowerA.release = null;
-            upperA.release = null;
-            lowerD.press = null;
-            upperD.press = null;
-            lowerD.release = null;
-            upperD.release = null;
-            space.press = null;
-            return;
-        }
-
-        let xPositionRatio = mage.x / app.renderer.view.width;
-        let yPositionRatio = mage.y / app.renderer.view.height;
-
-        // Rescale the mage based on window width
-        if ($(window).width() <= 768) {
-            mage.scale.set(0.05);
-
-        }
-        else if ($(window).width() <= 1440) {
-            mage.scale.set(0.19);
-        }
-        else {
-            mage.scale.set(0.25);
-        }
-
-        let yOffset = 0;
-        if ((app.renderer.view.width <= 768) && ($(window).width() > 768)) {
-            yOffset = 15;
-        }
-        if ((app.renderer.view.width <= 1440) && ($(window).width() > 1440)) {
-            yOffset = 45;
-        }
-        if ((app.renderer.view.width <= 768) && ($(window).width() > 1440)) {
-            yOffset = 85;
-        }
-
-        mage.x = xPositionRatio * $(window).width();
-        mage.y = (yPositionRatio * $(window).height()) - yOffset;
-
-        if (displayInstructions) {
-            if ($(window).width() <= 768) {
-                instructions.scale.set(0.05);
-                instructionsXOffset = 0;
-            }
-            else if ($(window).width() <= 1440) {
-                instructions.scale.set(0.30);
-                instructionsXOffset = 50;
-            }
-            else {
-                instructions.scale.set(0.40);
-                instructionsXOffset = 70;
-            }
-
-            instructions.x = mage.x + instructionsXOffset;
-            instructions.y = mage.y - mage.height;
-        }
-    }
-    else {
-        if (($(window).width() > 768) && (mageDied == false)) {
-            app = new Application({transparent: true});
-            app.renderer.view.style.position = "absolute";
-            app.renderer.view.style.top = "0";
-            app.renderer.view.style.left = "0";
-            app.renderer.view.style.display = "block";
-            app.renderer.autoDensity = true;
-            document.body.appendChild(app.view);
-
-            setup();
-        }
-    }
-
-    if (app) {
-        app.renderer.resize($(window).width(), $(window).height());
-    }
-}
-
-function keyboard(value) {
-    let key = {};
-    key.value = value;
-    key.isDown = false;
-    key.isUp = true;
-    key.press = undefined;
-    key.release = undefined;
-    //The `downHandler`
-    key.downHandler = event => {
-        if (event.key === key.value) {
-            if (key.isUp && key.press) key.press();
-            key.isDown = true;
-            key.isUp = false;
-            event.preventDefault();
-        }
-    };
-
-    //The `upHandler`
-    key.upHandler = event => {
-        if (event.key === key.value) {
-            if (key.isDown && key.release) key.release();
-            key.isDown = false;
-            key.isUp = true;
-            event.preventDefault();
-        }
-    };
-
-    //Attach event listeners
-    const downListener = key.downHandler.bind(key);
-    const upListener = key.upHandler.bind(key);
-
-    window.addEventListener(
-        "keydown", downListener, false
-    );
-    window.addEventListener(
-        "keyup", upListener, false
-    );
-
-    // Detach event listeners
-    key.unsubscribe = () => {
-        window.removeEventListener("keydown", downListener);
-        window.removeEventListener("keyup", upListener);
-    };
-
-    return key;
-}
-
-function leftPressed() {
-    mage.leftPressed = true;
-    displayInstructions = false;
-    app.stage.removeChild(instructions);
-}
-
-function leftReleased() {
-    mage.leftPressed = false;
-}
-
-function rightPressed() {
-    mage.rightPressed = true;
-    displayInstructions = false;
-    app.stage.removeChild(instructions);
-}
-
-function rightReleased() {
-    mage.rightPressed = false;
-}
-
-function jumpPressed() {
-    if (mage.jumping == false) {
-        mage.vy = -13;
-    }
-    displayInstructions = false;
-    app.stage.removeChild(instructions);
-}
-
-// Callback function for when the cast animation is completed
-function castAnimationComplete() {
-    if (mage) {
-        if (mage.textures == mageCastingRightTextures) {
-            mage.textures = mageWalkingRightTextures;
-        }
-        else {
-            mage.textures = mageWalkingLeftTextures;
-        }
-    }
-}
-
-// Casts a spell towards the mouse on click
-function castSpell() {
-    if (spell || !mage) { return; }
-
-    displayInstructions = false;
-    app.stage.removeChild(instructions);
-
-    let mouseX = event.clientX;
-    let mouseY = event.clientY;
-
-    mage.loop = false;
-    mage.onComplete = castAnimationComplete;
-    if (mouseX >= mage.x) {
-        mage.textures = mageCastingRightTextures;
-        mage.play();
-    }
-    else {
-        mage.textures = mageCastingLeftTextures;
-        mage.play();
-    }
-
-    spell = new AnimatedSprite(spellTextures);
-
-    // Rescale the spell based on window width
-    if ($(window).width() <= 768) {
-        spell.scale.set(0.05);
-    }
-    else if ($(window).width() <= 1440) {
-        spell.scale.set(1.9);
-    }
-    else {
-        spell.scale.set(2.5);
-    }
-
-    spell.anchor.x = 0.5;
-    spell.anchor.y = 0.5;
-    spell.x = mage.x;
-    spell.y = mage.y - (mage.width / 2);
-
-    let dx = mouseX - spell.x;
-    let dy = mouseY - spell.y;
-    let distance = Math.sqrt(dx*dx + dy*dy);
-
-    spell.vx = (dx / distance) * 3;
-    spell.vy = (dy / distance) * 3;
-    spell.ax = spell.vx * 0.15;
-    spell.ay = spell.vy * 0.15;
-    spell.rotationSpeed = 40;
-    spell.targetX = mouseX;
-    spell.targetY = mouseY;
-    spell.animationSpeed = 0.2;
-
-    app.stage.addChild(spell);
-    spell.play();
-
-    if (playSound) {
-        spellSound.pause();
-        spellSound.currentTime = 0;
-        spellSound.play();
-    }
-}
-
-// Kill the mage
-function killMage() {
-    app.stage.removeChild(mage);
-    mage = null;
-    
-    lowerA.press = null;
-    upperA.press = null;
-    lowerA.release = null;
-    upperA.release = null;
-    lowerD.press = null;
-    upperD.press = null;
-    lowerD.release = null;
-    upperD.release = null;
-    space.press = null;
-
-    mageDied = true;
-
-    if (instructions && (displayInstructions == true)) {
-        displayInstructions = false;
-        app.stage.removeChild(instructions);
-        instructions = null;
-    }
-
-    if (playSound) {
-        deathSound.pause();
-        deathSound.currentTime = 0;
-        deathSound.play();
-    }
-}
+// ----------------------------
+// Registering global listeners
+// ----------------------------
+$(window).resize(updateOnResize);
+$(document).click(clickHandler);
+
+// ---------------------------------
+// Defining mage and spell variables
+// ---------------------------------
+var mage = null;
+var spell = null;
+
+// --------------------------------------
+// Creating key objects for relevant keys
+// --------------------------------------
+var lowerA = createKey('a');
+var upperA = createKey('A');
+var lowerD = createKey('d');
+var upperD = createKey('D');
+var space = createKey(' ');
+
+// -------------------------
+// Registering key listeners
+// -------------------------
+lowerA.press = leftPressed;
+upperA.press = leftPressed;
+lowerA.release = leftReleased;
+upperA.release = leftReleased;
+
+lowerD.press = rightPressed;
+upperD.press = rightPressed;
+lowerD.release = rightReleased;
+upperD.release = rightReleased;
+
+space.press = jumpPressed;
+
+// -----------------------
+// Go! (Setting up Loader)
+// -----------------------
+Loader.add([]).load(setup);
+
+// ===============
+// End PIXI script
+// ===============
+
+// ==========
+// End script
+// ==========

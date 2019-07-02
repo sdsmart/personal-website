@@ -1,4 +1,9 @@
-/* --- Centerpiece styles --- */
+/* 
+------------------ 
+Begin Index styles
+------------------
+*/ 
+
 body {
     overflow: hidden;
     -webkit-user-select: none;
@@ -42,7 +47,6 @@ canvas {
 #center-l8 { color: #FF9800; }
 #center-l9 { color: #4CAF50; }
 #center-l10 { color: #9C27B0; }
-/* --- End centerpiece styles --- */
 
 .speaker-img {
     cursor: pointer;
@@ -56,7 +60,18 @@ canvas {
     display: none;
 }
 
-/* --- Tablet behavior --- */
+/* 
+---------------- 
+End Index styles
+----------------
+*/
+
+/* 
+---------------------
+Begin Tablet Behavior
+---------------------
+*/ 
+
 @media screen and (min-width: 768px) and (max-width: 1440px) {
     #centerpiece {
         font-size: 90px;
@@ -72,9 +87,19 @@ canvas {
         }
     }
 }
-/* --- End tablet behavior --- */
 
-/* --- Mobile behavior --- */
+/* 
+-------------------
+End Tablet Behavior
+-------------------
+*/ 
+
+/* 
+---------------------
+Begin Mobile Behavior
+---------------------
+*/ 
+
 @media screen and (max-width: 768px) {
     #centerpiece {
         font-size: 52px;
@@ -92,4 +117,9 @@ canvas {
         display: none;
     }
 }
-/* --- End mmobile behavior --- */
+
+/* 
+-------------------
+End Mobile Behavior
+-------------------
+*/
