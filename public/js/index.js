@@ -189,9 +189,11 @@ for (let i=0; i < instructionsImgs.length; i++) {
 }
 
 // Keyboard objects
-left = keyboard('a');
-right = keyboard('d');
-jump = keyboard(' ');
+lowerA = keyboard('a');
+upperA = keyboard('A');
+lowerD = keyboard('d');
+upperD = keyboard('D');
+space = keyboard(' ');
 
 // Load sprite image as texture and create sprite
 if ($(window).width() > 768) {
@@ -227,37 +229,19 @@ function setup() {
     mage.jumping = false;
     mage.animationSpeed = 0.2;
 
-    left.press = function() {
-        mage.leftPressed = true;
-        displayInstructions = false;
-        app.stage.removeChild(instructions);
-    }
-    left.release = function() {
-        mage.leftPressed = false;
-        displayInstructions = false;
-        app.stage.removeChild(instructions);
-    }
+    lowerA.press = leftPressed;
+    upperA.press = leftPressed;
+    lowerA.release = leftReleased;
+    upperA.release = leftReleased;
 
-    right.press = function() {
-        mage.rightPressed = true;
-        displayInstructions = false;
-        app.stage.removeChild(instructions);
-    }
-    right.release = function() {
-        mage.rightPressed = false;
-        displayInstructions = false;
-        app.stage.removeChild(instructions);
-    }
+    lowerD.press = rightPressed;
+    upperD.press = rightPressed;
+    lowerD.release = rightReleased;
+    upperD.release = rightReleased;
 
-    jump.press = function() {
-        if (mage.jumping == false) {
-            mage.vy = -13;
-        }
-        displayInstructions = false;
-        app.stage.removeChild(instructions);
-    }
+    space.press = jumpPressed;
 
-    // Adding the mage sprite the the stage
+    // Adding the mage sprite to the stage
     app.stage.addChild(mage);
 
     // Display instructions if needed
@@ -458,11 +442,15 @@ function resizeUpdate() {
             mage = null;
             spell = null;
             instructions = null;
-            left.press = null;
-            left.release = null;
-            right.press = null;
-            right.release = null;
-            jump.press = null;
+            lowerA.press = null;
+            upperA.press = null;
+            lowerA.release = null;
+            upperA.release = null;
+            lowerD.press = null;
+            upperD.press = null;
+            lowerD.release = null;
+            upperD.release = null;
+            space.press = null;
             return;
         }
 
@@ -579,6 +567,34 @@ function keyboard(value) {
     return key;
 }
 
+function leftPressed() {
+    mage.leftPressed = true;
+    displayInstructions = false;
+    app.stage.removeChild(instructions);
+}
+
+function leftReleased() {
+    mage.leftPressed = false;
+}
+
+function rightPressed() {
+    mage.rightPressed = true;
+    displayInstructions = false;
+    app.stage.removeChild(instructions);
+}
+
+function rightReleased() {
+    mage.rightPressed = false;
+}
+
+function jumpPressed() {
+    if (mage.jumping == false) {
+        mage.vy = -13;
+    }
+    displayInstructions = false;
+    app.stage.removeChild(instructions);
+}
+
 // Callback function for when the cast animation is completed
 function castAnimationComplete() {
     if (mage) {
@@ -658,11 +674,15 @@ function killMage() {
     app.stage.removeChild(mage);
     mage = null;
     
-    left.press = null;
-    left.release = null;
-    right.press = null;
-    right.release = null;
-    jump.press = null;
+    lowerA.press = null;
+    upperA.press = null;
+    lowerA.release = null;
+    upperA.release = null;
+    lowerD.press = null;
+    upperD.press = null;
+    lowerD.release = null;
+    upperD.release = null;
+    space.press = null;
 
     mageDied = true;
 
