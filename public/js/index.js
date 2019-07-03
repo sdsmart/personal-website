@@ -699,8 +699,6 @@ function setup() {
 // ---------------------------------------------------
 function gameLoop(delta) {
 
-    console.log(`ms: ${app.ticker.deltaMS}, speed: ${app.ticker.speed}`);
-
     if (mage != null) {
         if (mage.dead == false) {
             mage.update();
