@@ -249,6 +249,18 @@ function Mage() {
         }
     };
 
+    this.revive = function() {
+    	this.sprite.x = (app.renderer.view.width / 2);
+        this.sprite.y = ($('#centerpiece').offset().top + 5);
+        this.sprite.vx = 0;
+        this.sprite.vy = 0;
+        this.sprite.ax = 0;
+        this.sprite.ay = 0;
+        this.dead = false;
+
+        app.stage.addChild(this.sprite);
+    }
+
     this.jump = function() {
         this.sprite.vy = -13;
     };
@@ -679,13 +691,16 @@ function setup() {
     app.ticker.add(delta => gameLoop(delta));
 }
 
-// ---------------------------------------------------------
-// Executes every 60 times per second and updates game state
-// ---------------------------------------------------------
+// ---------------------------------------------------
+// Executes 60 times per second and updates game state
+// ---------------------------------------------------
 function gameLoop() {
     if (mage != null) {
         if (mage.dead == false) {
             mage.update();
+        }
+        else {
+        	mage.revive();
         }
     }
 
