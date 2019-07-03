@@ -15,7 +15,6 @@
 // Begin function definitions
 // ==========================
 
-
 // -----------------------------------------------
 // Animates centerpiece text with colorful letters
 // -----------------------------------------------
@@ -798,7 +797,11 @@ function clickHandler() {
 // ------------------------------------------------------------------
 $('a').click(function() {
     event.stopPropagation();
-})
+});
+
+$('#logo').click(function() {
+    event.stopPropagation();
+});
 
 // ---------------------------------------------
 // Animating centerpiece text with pretty colors
