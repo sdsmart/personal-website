@@ -284,3 +284,43 @@ Begin iOS only Behavior
 End iOS only Behavior
 ---------------------
 */
+
+/* 
+--------------------------
+Begin Safari only Behavior
+--------------------------
+*/
+
+@media screen and (min-color-index:0) and(-webkit-min-device-pixel-ratio:0) { 
+    .hover-link:hover::after {
+	    width: 100%;
+	}
+
+	.hover-link:hover::before {
+	    width: 100%;
+	}
+
+	.active-link::after {
+		width: 100%;
+	}
+}
+
+@media not all and (min-resolution:.001dpcm) { 
+	.hover-link:hover::after {
+	    width: 100%;
+	}
+
+	.hover-link:hover::before {
+	    width: 100%;
+	}
+
+	.active-link::after {
+		width: 100%;
+	}
+}
+
+/* 
+------------------------
+End Safari only Behavior
+------------------------
+*/
