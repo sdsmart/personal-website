@@ -80,7 +80,7 @@ html {
 
 .hover-link::before {
     content: '';
-    position: absolute;
+    position: relative;
     display: block;
     width: 0;
     height: 3px;
@@ -90,7 +90,7 @@ html {
 
 .hover-link::after {
     content: '';
-    position: absolute;
+    position: relative;
     display: block;
     width: 0;
     height: 3px;
@@ -99,12 +99,12 @@ html {
 }
 
 .hover-link:hover::after {
-    width: calc(100% + 18px);
+    width: 100%;
     transition: width 0.3s;
 }
 
 .hover-link:hover::before {
-    width: calc(100% + 18px);
+    width: 100%;
     transition: width 0.3s;
 }
 
@@ -123,9 +123,9 @@ html {
 
 .active-link::after {
     content: '';
-    position: absolute;
+    position: relative;
     display: block;
-    width: calc(100% + 18px);
+    width: 100%;
     height: 3px;
     background: #000000;
 }
@@ -149,10 +149,6 @@ Begin Tablet Behavior
 
     .navlinks a {
         font-size: 30px;
-    }
-
-    .hover-link::before {
-        top: -2px;
     }
 
     #logo {
@@ -202,10 +198,6 @@ Begin Mobile Behavior
 
     .navlinks li {
         opacity: 0;
-    }
-
-    .hover-link::before {
-        top: -3px;
     }
 
     #hamburger {
@@ -268,59 +260,10 @@ Begin iOS only Behavior
     .hover-link::before {
         content: ;
     }
-
-    .active-link::after {
-        content: '';
-        position: absolute;
-        display: block;
-        width: calc(100%);
-        height: 3px;
-        background: #000000;
-    }
 }
 
 /* 
 ---------------------
 End iOS only Behavior
 ---------------------
-*/
-
-/* 
---------------------------
-Begin Safari only Behavior
---------------------------
-*/
-
-@media screen and (min-color-index:0) and(-webkit-min-device-pixel-ratio:0) { 
-    .hover-link:hover::after {
-	    width: 100%;
-	}
-
-	.hover-link:hover::before {
-	    width: 100%;
-	}
-
-	.active-link::after {
-		width: 100%;
-	}
-}
-
-@media not all and (min-resolution:.001dpcm) { 
-	.hover-link:hover::after {
-	    width: 100%;
-	}
-
-	.hover-link:hover::before {
-	    width: 100%;
-	}
-
-	.active-link::after {
-		width: 100%;
-	}
-}
-
-/* 
-------------------------
-End Safari only Behavior
-------------------------
 */
