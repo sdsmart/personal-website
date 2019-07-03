@@ -41,7 +41,7 @@ function navSlide() {
                 li.style.animation = '';
             }
             else {
-                li.style.animation = `hamburgerFade 0.5s ease forwards ${(index / 7) + 0.3}s`;
+                li.style.animation = 'hamburgerFade 0.5s ease forwards ' + ((index / 7) + 0.3) + 's';
             }
         });
     });
@@ -92,7 +92,7 @@ function typeWriterPrep(container, html) {
             newHTML += char;
         }
         else {
-            newHTML += `<span id="tw${letterCounter}" class="hidden">${char}</span>`;
+            newHTML += '<span id="tw' + letterCounter + '" class="hidden">' + char + '</span>';
             letterCounter++;
         }
     }
@@ -107,12 +107,34 @@ function typeWriterPrep(container, html) {
 // ---------------------------------------------------------------------------
 function typeWriter(element, index, totalChars, speed) {
     if (index < totalChars) {
-        var letter = element.find(`#tw${index}`);
+        var letter = element.find('#tw' + index);
         letter.removeClass('hidden');
         setTimeout(function() {
             typeWriter(element, index+1, totalChars, speed);
         }, speed);
     }
+}
+
+
+// ------------------------------------------------------
+// Returns true if browser is IE, otherwise returns false
+// ------------------------------------------------------
+function isBrowserIE() {
+    var ua = window.navigator.userAgent;
+
+    // IE 10 and older
+    var msie = ua.indexOf('MSIE ');
+    if (msie > 0) {
+        return true;
+    }
+
+    // IE 11
+    var trident = ua.indexOf('Trident/');
+    if (trident > 0) {
+        return true;
+    }
+
+    return false;
 }
 
 // --------------------
@@ -121,7 +143,9 @@ function typeWriter(element, index, totalChars, speed) {
 function shuffle(a) {
     for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
+        let temp = a[i];
+        a[i] = a[j];
+        a[j] = temp;
     }
 
     return a;
@@ -140,7 +164,7 @@ function shuffle(a) {
 // ----------------------------------------------------------
 $('#logo').click(function() {
     window.location = '/';
-})
+});
 
 // -------------------------------------
 // Setting up the navbar slide animation
@@ -151,6 +175,16 @@ navSlide();
 // Setting up the removal of extraneous classes when the window is resized
 // -----------------------------------------------------------------------
 windowResizeListener();
+
+// -------------------------------------------------------------------------
+// Give IE Users an alert stating that the website does not fully support IE
+// -------------------------------------------------------------------------
+if (isBrowserIE() == true) {
+    alert('ATTENTION!\n\nThis website does not fully support Internet Explorer. ' +
+          'Microsoft themselves have all but discontinued support for Internet Explorer, ' +
+          'so if you enjoy using Microsoft products, please use Microsoft Edge.\n\n' +
+          'However, if you want the best performance, use Google Chrome.');
+}
 
 // ============
 // Begin script

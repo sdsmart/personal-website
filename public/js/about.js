@@ -25,10 +25,10 @@ window.onbeforeunload = function () {
 // ----------------------------------------------
 // Skips the text scroll when the link is clicked
 // ----------------------------------------------
-$('.skip-text-scroll').click(function() {
+$('.skip-text-scroll').first().click(function() {
     clearTimeout();
     $('#text-container').html('<h1>ABOUT ME</h1><br>');
-    $('#text-container').append(aboutMeHTML);    
+    $('#text-container').append(aboutMeHTML);   
 });
 
 // ------------------------------------------------

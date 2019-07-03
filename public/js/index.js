@@ -30,7 +30,7 @@ function colorizeCenterpieceText() {
     textColorsShuffled = shuffle(textColors);
 
     $('#centerpiece span').each(function(index, span) {
-        span.style = `color: ${textColorsShuffled[index]}`;
+        span.style = 'color: ' + textColorsShuffled[index];
     });
 }
 
@@ -579,7 +579,7 @@ function createKey(value) {
     key.release = undefined;
     
     // The down handler
-    key.downHandler = event => {
+    key.downHandler = function(event) {
         if (event.key === key.value) {
             if (key.isUp && key.press) key.press();
             key.isDown = true;
@@ -589,7 +589,7 @@ function createKey(value) {
     };
 
     // The up handler
-    key.upHandler = event => {
+    key.upHandler = function(event) {
         if (event.key === key.value) {
             if (key.isDown && key.release) key.release();
             key.isDown = false;
@@ -610,7 +610,7 @@ function createKey(value) {
     );
 
     // Detaching event listeners
-    key.unsubscribe = () => {
+    key.unsubscribe = function() {
         window.removeEventListener("keydown", downListener);
         window.removeEventListener("keyup", upListener);
     };
@@ -690,7 +690,9 @@ function setup() {
 
     app.ticker.maxFPS = 60;
     app.ticker.minFPS = 60;
-    app.ticker.add(delta => gameLoop(delta));
+    app.ticker.add(function(delta) {
+        gameLoop(delta);
+    });
 }
 
 // ---------------------------------------------------
@@ -826,9 +828,7 @@ $('#mute-sound img').click(function() {
 
     // Play background soundtrack
     if (playSound == true) {
-        soundtrack.play().catch(function() {
-            console.log('Failed to play background music.');
-        });
+        soundtrack.play();
     }
     else {
         soundtrack.currentTime = 0;
@@ -849,13 +849,13 @@ soundtrack.loop = true;
 // ----------------------
 // Setting up spell sound
 // ----------------------
-var spellSound = new Audio('/sound/spell.wav');
+var spellSound = new Audio('/sound/spell.mp3');
 spellSound.volume = 0.05;
 
 // --------------------------------
 // Setting up spell collision sound
 // --------------------------------
-var spellCollideSound = new Audio('/sound/spell_collide.wav');
+var spellCollideSound = new Audio('/sound/spell_collide.mp3');
 spellCollideSound.volume = 0.3;
 spellCollideSound.addEventListener('ended', function() {
     spell.collidedNavElement.firstChild.click();
@@ -864,7 +864,7 @@ spellCollideSound.addEventListener('ended', function() {
 // ---------------------------
 // Setting up mage death sound
 // ---------------------------
-var deathSound = new Audio('/sound/death2.wav');
+var deathSound = new Audio('/sound/death.mp3');
 deathSound.volume = 0.3;
 
 // =======================
@@ -923,10 +923,11 @@ var upperA = createKey('A');
 var lowerD = createKey('d');
 var upperD = createKey('D');
 var space = createKey(' ');
+var spaceIE = createKey('Spacebar');
 
 // -------------------------
 // Registering key listeners
-// -------------------------
+// ------------------------- 
 lowerA.press = leftPressed;
 upperA.press = leftPressed;
 lowerA.release = leftReleased;
@@ -938,6 +939,7 @@ lowerD.release = rightReleased;
 upperD.release = rightReleased;
 
 space.press = jumpPressed;
+spaceIE.press = jumpPressed;
 
 // -----------------------
 // Go! (Setting up Loader)
