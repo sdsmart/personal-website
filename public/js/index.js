@@ -71,6 +71,7 @@ function Mage() {
 
     this.maxXSpeed = 6;
     this.xAcceleration = 1.5;
+    this.jumpSpeed = 13;
 
     this.leftPressed = false;
     this.rightPressed = false;
@@ -250,7 +251,7 @@ function Mage() {
     };
 
     this.revive = function() {
-    	this.sprite.x = (app.renderer.view.width / 2);
+        this.sprite.x = (app.renderer.view.width / 2);
         this.sprite.y = ($('#centerpiece').offset().top + 5);
         this.sprite.vx = 0;
         this.sprite.vy = 0;
@@ -262,7 +263,7 @@ function Mage() {
     }
 
     this.jump = function() {
-        this.sprite.vy = -13;
+        this.sprite.vy = -this.jumpSpeed;
     };
 
     this.castSpell = function(targetX, targetY) {
@@ -688,19 +689,24 @@ function setup() {
         document.body.appendChild(app.view);
     }
 
+    app.ticker.maxFPS = 60;
+    app.ticker.minFPS = 60;
     app.ticker.add(delta => gameLoop(delta));
 }
 
 // ---------------------------------------------------
 // Executes 60 times per second and updates game state
 // ---------------------------------------------------
-function gameLoop() {
+function gameLoop(delta) {
+
+    console.log(`ms: ${app.ticker.deltaMS}, speed: ${app.ticker.speed}`);
+
     if (mage != null) {
         if (mage.dead == false) {
             mage.update();
         }
         else {
-        	mage.revive();
+            mage.revive();
         }
     }
 
