@@ -28,7 +28,7 @@ var dbURL = "mongodb://localhost:27017/blog_db";
 // ----------------
 // Setting the port
 // ----------------
-app.set('port', (process.env.PORT || 80));
+app.set('port', (process.env.PORT || 5000));
 
 // ----------------------------------
 // Setting up the body-parser package
