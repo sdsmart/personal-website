@@ -115,6 +115,23 @@ function typeWriter(element, index, totalChars, speed) {
     }
 }
 
+// -----------------------------------------------
+// Detects if the current device is a touch screen
+// -----------------------------------------------
+function isTouchDevice() {
+    var prefixes = ' -webkit- -moz- -o- -ms- '.split(' ');
+    var mq = function(query) {
+        return window.matchMedia(query).matches;
+    }
+
+    if (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
+        return true;
+    }
+
+    var query = ['(', prefixes.join('touch-enabled),('), 'heartz', ')'].join('');
+    return mq(query);
+}
+
 
 // ------------------------------------------------------
 // Returns true if browser is IE, otherwise returns false
@@ -135,6 +152,18 @@ function isBrowserIE() {
     }
 
     return false;
+}
+
+// -----------------------------------------------------------
+// Returns true if browser is Firefox, otherwise returns false
+// -----------------------------------------------------------
+function isBrowserFirefox() {
+    if(window.navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 // --------------------

@@ -34,23 +34,6 @@ function colorizeCenterpieceText() {
     });
 }
 
-// -----------------------------------------------
-// Detects if the current device is a touch screen
-// -----------------------------------------------
-function isTouchDevice() {
-    var prefixes = ' -webkit- -moz- -o- -ms- '.split(' ');
-    var mq = function(query) {
-        return window.matchMedia(query).matches;
-    }
-
-    if (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
-        return true;
-    }
-
-    var query = ['(', prefixes.join('touch-enabled),('), 'heartz', ')'].join('');
-    return mq(query);
-}
-
 // ===============================
 // Begin PIXI function definitions
 // ===============================
@@ -895,7 +878,11 @@ var AnimatedSprite = PIXI.AnimatedSprite;
 // ---------------------------
 // Creating a Pixi Application
 // ---------------------------
-var app = new Application({transparent: true});
+let options = {transparent: true};
+if (isBrowserFirefox() == true) {
+    options.forceCanvas = true;
+}
+var app = new Application(options);
 app.renderer.view.style.position = "absolute";
 app.renderer.view.style.top = "0";
 app.renderer.view.style.left = "0";
