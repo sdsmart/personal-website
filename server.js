@@ -151,7 +151,7 @@ app.post(['/blog/1'], function(request, response) {
         var newComment = {
             blog_id: '1',
             name: sanitize(xss(request.body.name, xssOptions)),
-            datetime: sanitize(xss(request.body.datetime, xssOptions)),
+            datetime: new Date(),
             date: sanitize(xss(request.body.date, xssOptions)),
             time: sanitize(xss(request.body.time, xssOptions)),
             comment: sanitize(xss(request.body.comment, xssOptions))

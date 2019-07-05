@@ -98,7 +98,7 @@ $('.post-button').first().click(function() {
     var time = String(now.getUTCHours()).padStart(2, '0') + ':' + String(now.getUTCMinutes()).padStart(2, '0');
 
     // Creating the data object sent with the POST request
-    var data = {name: name, datetime: now.toUTCString(), date: date, time: time, comment: comment};
+    var data = {name: name, date: date, time: time, comment: comment};
 
     // Sending POST request with comment data to the server
     $.ajax({
